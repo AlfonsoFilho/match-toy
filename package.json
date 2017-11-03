@@ -1,0 +1,32 @@
+{
+  "name": "like-a-glove",
+  "version": "0.0.0",
+  "description": "",
+  "main": "like-a-glove.js",
+  "scripts": {
+    "build": "tsc like-a-glove.ts",
+    "test": "jest",
+    "test:watch": "jest --watchAll"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "21.1.5",
+    "jest": "21.2.1",
+    "typescript": "2.5.3"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "<rootDir>/preprocessor.js"
+    },
+    "testMatch": [
+      "**/*.spec.(ts|tsx|js)"
+    ]
+  }
+}
