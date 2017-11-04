@@ -1,0 +1,38 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+				"tslint:recommended",
+				"tslint-eslint-rules"
+    ],
+    "jsRules": {},
+    "rules": {
+      "interface-name": [true, "never-prefix"],
+      "object-literal-sort-keys": [true, "ignore-case", "match-declaration-order"],
+      "only-arrow-functions": [true, "allow-declarations", "allow-named-functions"],
+      "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
+      "quotemark": [true, "single"],
+      "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
+      "member-ordering": [true, {
+        "order": [
+          "private-static-field",
+          "protected-static-field",
+          "public-static-field",
+
+          "private-instance-field",
+          "protected-instance-field",
+          "public-instance-field",
+
+          "constructor",
+
+          "private-static-method",
+          "protected-static-method",
+          "public-static-method",
+
+          "private-instance-method",
+          "protected-instance-method",
+          "public-instance-method"
+        ]
+      }]
+    },
+    "rulesDirectory": []
+}
