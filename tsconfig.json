@@ -1,7 +1,26 @@
 {
   "compilerOptions": {
+
     "target": "es5",
-    "module": "umd",
-    "strict": true
+    "module": "commonjs",
+    "lib": [
+      "es2015"
+    ],
+    "pretty": true,
+    
+    "importHelpers": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+
+    "downlevelIteration": true,
+    "isolatedModules": true,
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
   }
 }
