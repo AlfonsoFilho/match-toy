@@ -1,4 +1,5 @@
-import * as parser from './lang.gen.js';
+import { parse } from './grammar.gen';
+import { Pattern } from './types';
 
-export const compile = (source: string) =>
-  parser.parse(source);
+export const compile = (source: string): Pattern =>
+  (parse(source, {}) as Pattern);

@@ -12,7 +12,8 @@ float           = minus? digit dot? digit?
 rest_symbol     = '...'
 rest            = ws rest_symbol b:word? { return { type: 'REST', name: b } }
 range_symbol    = '..'
-range           = ws start:digit range_symbol end:digit ws { return { type: 'RANGE', start: parseInt(start.join(''), 10), end: parseInt(end.join(''), 10) } }
+range_item      = minus? digit / [a-z] / [A-Z]
+range           = ws start:range_item range_symbol end:range_item ws { return { type: 'RANGE', start: typeof start === 'string' ? start : parseFloat([].concat(...start).join('')), end: typeof end === 'string' ? end : parseFloat([].concat(...end).join('')) } }
 colon           = ':'
 and             = ws '&' ws
 or              = ws '|' ws
@@ -60,7 +61,9 @@ boolean = b:(true / false) {
     }
 }
 
-bind = b:word colon? t:type? { return { type: 'BIND', value: b, typeOf: t } }
+typedVar = colon t:type { return t }
+
+bind = b:word t:typedVar? { return { type: 'BIND', value: b, typeOf: t } }
 
 array
   = bracket_open
@@ -119,7 +122,11 @@ object
       	var result = [];
 
         [head].concat(tail).forEach(function(element) {
-          result.push(Object.assign(element.bind ? { type: 'BIND', value: element.value } : element.value, {key: element.name}));
+          if(element.rest) { 
+            result.push({ type: 'REST', name: element.name, key: element.name })
+          } else {
+            result.push(Object.assign(element.bind ? { type: 'BIND', value: element.value } : element.value, {key: element.name}));
+          }
         });
 
         return result;
@@ -129,8 +136,10 @@ object
     { return { type: 'OBJECT', values: members !== null ? members : [] }; }
 
 member
-  = name:word name_separator value:values { return { name: name, value: value }; }
+  = t:rest { return { name: t.name, value: null, rest: true } }
+  / name:word name_separator value:values { return { name: name, value: value }; }
   / name:word { return { name: name, value: name, bind: true } }
+   
 
 asOp = left:andOp as right:bind { return { type: 'AS', value: left, name: right.value } }
      / andOp
@@ -152,6 +161,6 @@ arguments
       tail:(comma ws v:values ws { return v; })*
       { return  [head].concat(tail) }
     )?
-{  return val !== null ? { type: 'ARGUMENTS', values: val} : error('Expected a literal or variable definition here.') }
+{  return val !== null ? { type: 'ARGUMENTS', values: val} : text() }
 
 root = asOp

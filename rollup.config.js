@@ -8,11 +8,7 @@ export default {
   input: 'src/index.ts',
   plugins: [
     resolve(),
-    commonjs({
-      namedExports: {
-        'src/lang.gen.js': [ 'parse' ]
-      }
-    }),
+    commonjs(),
     typescript({
       typescript: require('typescript')
     }),
@@ -24,8 +20,9 @@ export default {
     filesize()
   ],
   output: {
-    file: 'dist/bundle.js',
+    file: 'dist/bundle/index.js',
     format: 'umd',
-    name: 'like-a-glove'
+    name: 'match-ish',
+    sourcemap: true
   }
 };

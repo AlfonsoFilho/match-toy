@@ -1,9 +1,8 @@
-
 import { compile } from './compiler';
 import { interpreter } from './interpreter';
-import { AnyFn, BoolFn, MatchItem, MatchResult } from './types';
+import { AnyFn, BoolFn, ErrorMessages, MatchItem } from './types';
 
-class Matcher {
+export class Matcher {
 
   private initialValues: any;
   private matchList: MatchItem[];
@@ -14,33 +13,26 @@ class Matcher {
     this.initialValues = value;
     this.matchList = [];
     this.elseValue = () => undefined;
-    this.catchCallback = (e: Error) => `Match error: ${e}`;
+    this.catchCallback = this.defaultCatchCallback;
   }
 
-  private evaluatePattern(pattern: any, values: any[]): MatchResult {
+  private defaultCatchCallback = (e: Error) => `Match error: ${e}`;
 
-    if (pattern.__meta__ && pattern.__meta__.version === 1) {
-      return interpreter(pattern, values);
-    }
+  private runMatch(value: any[]): any {
 
-    if (pattern === values[0]) {
-      return [ true, [values[0]]];
-    }
-
-    return [ false, {} ];
-  }
-
-  private runMatch(value: any[]): void {
-
-    const { matchCallback, matchArgs } = this.matchList.reduce((state, {pattern, predicate, guard}) => {
+    const { matchCallback, matchArgs } = this.matchList.reduce((state, {pattern, predicate, guard = () => true}) => {
 
       if (state.done) {
         return state;
       }
 
-      const [ resultStatus, result ] = this.evaluatePattern(pattern, value);
+      if (typeof predicate !== 'function') {
+        throw new Error(ErrorMessages.MISSING_PREDICATE);
+      }
 
-      if (resultStatus !== false && guard(value) && typeof predicate === 'function') {
+      const [ resultStatus, result ] = interpreter(pattern, value);
+
+      if (resultStatus !== false && guard.call(null, ...value) && typeof predicate === 'function') {
         state.matchCallback = predicate;
         state.matchArgs = result;
         state.done = true;
@@ -52,11 +44,15 @@ class Matcher {
     try {
       return matchCallback(matchArgs);
     } catch (error) {
-      return this.catchCallback(error);
+      try {
+        return this.catchCallback(error);
+      } catch (error) {
+        return this.defaultCatchCallback(error);
+      }
     }
   }
 
-  public with(pattern: string, predicate?: AnyFn, guard: BoolFn = () => true) {
+  public with(pattern: string, predicate?: AnyFn, guard?: BoolFn) {
     this.matchList.push({ pattern: compile(pattern), predicate, guard });
     return this;
   }
@@ -67,7 +63,11 @@ class Matcher {
   }
 
   public when(func: BoolFn): Matcher {
-    this.matchList[this.matchList.length - 1].guard = func;
+    const lastRule = this.matchList[this.matchList.length - 1];
+    if (typeof lastRule.guard !== 'undefined') {
+      throw new Error(ErrorMessages.ONE_GUARD_PER_PATTERN);
+    }
+    lastRule.guard = func;
     return this;
   }
 
@@ -82,9 +82,14 @@ class Matcher {
   }
 
   public end()  {
+    if (this.matchList.length === 0) {
+      throw new Error(ErrorMessages.NO_PATTERN_DEFINED);
+    }
+
     if (this.initialValues.length > 0) {
       return this.runMatch(this.initialValues);
     }
+
     return (...value: any[]) => this.runMatch(value);
   }
 }

@@ -1,5 +1,6 @@
 import { compile } from './compiler';
 import { interpreter } from './interpreter';
+import { AstType } from './types';
 
 describe('Interpreter', () => {
 
@@ -291,7 +292,11 @@ describe('Interpreter', () => {
       });
 
       it('should match', () => {
-        expect(interpreter(pattern, ['_'])).toEqual([true, {}]);
+        expect(interpreter(pattern, [1])).toEqual([true, {}]);
+      });
+
+      it('should match', () => {
+        expect(interpreter(pattern, [])).toEqual(FAIL);
       });
     });
 
@@ -326,6 +331,24 @@ describe('Interpreter', () => {
       it('should match', () => {
         expect(interpreter(pattern, [[1, '_', 1]])).toEqual([true, {}]);
       });
+    });
+  });
+
+  describe('Object pattern', () => {
+
+    it('empty', () => {
+      pattern = compile('{}');
+      expect(interpreter(pattern, [{}])).toEqual([true, {}]);
+    });
+
+    it('with rest', () => {
+      pattern = compile('{ a: 1, ...tail }');
+      expect(interpreter(pattern, [{ a: 1, b: 2 , c: 3}])).toEqual([true, { tail: { b: 2, c: 3 }}]);
+    });
+
+    it('with rest in the middle', () => {
+      pattern = compile('{ a: 1, ...tail, d: x }');
+      expect(interpreter(pattern, [{ a: 1, b: 2 , c: 3, d: 4}])).toEqual([true, { x: 4, tail: { b: 2, c: 3 }}]);
     });
   });
 
@@ -392,7 +415,6 @@ describe('Interpreter', () => {
     describe('should split list', () => {
       beforeEach(() => {
         // with('[a, b, c, ...xs]', ({a, b, c, rest}) => void)
-        // with('a:b:c:xs', ({a, b, c, xs}) => void)
         pattern = compile('[a, b, c, ...xs]');
       });
 
@@ -404,12 +426,41 @@ describe('Interpreter', () => {
     describe('should allow rest in the middle od the list', () => {
       beforeEach(() => {
         // with('[a, ...btox, y, z]', ({a, b, c, rest}) => void)
-        // with('a:b:c:xs', ({a, b, c, xs}) => void)
         pattern = compile('[a, ...btox, y, z]');
       });
 
       it('should match', () => {
         expect(interpreter(pattern, [[1, 2, 3, 4, 5, 6]])).toEqual([true, { a: 1, btox: [2, 3, 4], y: 5, z: 6 }]);
+      });
+    });
+
+    describe('should match a non empty array', () => {
+      beforeEach(() => {
+        // with('[...]', () => void)
+        pattern = compile('[...]');
+      });
+
+      it('should match', () => {
+        expect(interpreter(pattern, [[1, 2, 3, 4, 5, 6]])).toEqual([true, {}]);
+      });
+
+      it('should not match', () => {
+        expect(interpreter(pattern, [[]])).toEqual(FAIL);
+      });
+    });
+
+    describe('should match a non empty array', () => {
+      beforeEach(() => {
+        // with('{...}', () => void)
+        pattern = compile('{...}');
+      });
+
+      it('should match', () => {
+        expect(interpreter(pattern, [{a: 2}])).toEqual([true, {}]);
+      });
+
+      it('should not match', () => {
+        expect(interpreter(pattern, [{}])).toEqual(FAIL);
       });
     });
   });
@@ -435,6 +486,75 @@ describe('Interpreter', () => {
       it('should not match if input is not a number', () => {
         expect(interpreter(pattern, ['1'])).toEqual(FAIL);
         expect(interpreter(pattern, ['x'])).toEqual(FAIL);
+        expect(interpreter(pattern, [true])).toEqual(FAIL);
+      });
+    });
+
+    describe('when matching a range of chars', () => {
+      beforeEach(() => {
+        // with('a..f', () => void)
+        pattern = compile('a..f');
+      });
+
+      it('should match', () => {
+        expect(interpreter(pattern, ['a'])).toEqual([true, {}]);
+        expect(interpreter(pattern, ['c'])).toEqual([true, {}]);
+        expect(interpreter(pattern, ['f'])).toEqual([true, {}]);
+      });
+
+      it('should not match if input is out of range', () => {
+        expect(interpreter(pattern, ['A'])).toEqual(FAIL);
+        expect(interpreter(pattern, ['g'])).toEqual(FAIL);
+      });
+
+      it('should not match if input is not a char', () => {
+        expect(interpreter(pattern, [1])).toEqual(FAIL);
+        expect(interpreter(pattern, [true])).toEqual(FAIL);
+      });
+    });
+
+    describe('when matching a range of uppercase chars', () => {
+      beforeEach(() => {
+        // with('a..f', () => void)
+        pattern = compile('A..F');
+      });
+
+      it('should match', () => {
+        expect(interpreter(pattern, ['A'])).toEqual([true, {}]);
+        expect(interpreter(pattern, ['C'])).toEqual([true, {}]);
+        expect(interpreter(pattern, ['F'])).toEqual([true, {}]);
+      });
+
+      it('should not match if input is out of range', () => {
+        expect(interpreter(pattern, ['G'])).toEqual(FAIL);
+        expect(interpreter(pattern, ['c'])).toEqual(FAIL);
+      });
+
+      it('should not match if input is not a char', () => {
+        expect(interpreter(pattern, [1])).toEqual(FAIL);
+        expect(interpreter(pattern, [true])).toEqual(FAIL);
+      });
+    });
+
+    describe('when matching a range of mix chars', () => {
+      beforeEach(() => {
+        // with('A..f', () => void)
+        pattern = compile('A..f');
+      });
+
+      it('should match', () => {
+        expect(interpreter(pattern, ['A'])).toEqual([true, {}]);
+        expect(interpreter(pattern, ['C'])).toEqual([true, {}]);
+        expect(interpreter(pattern, ['c'])).toEqual([true, {}]);
+      });
+
+      it('should not match if input is out of range', () => {
+        expect(interpreter(pattern, ['g'])).toEqual(FAIL);
+        expect(interpreter(pattern, ['h'])).toEqual(FAIL);
+      });
+
+      it('should not match if input is not a char', () => {
+        expect(interpreter(pattern, [1])).toEqual(FAIL);
         expect(interpreter(pattern, [true])).toEqual(FAIL);
       });
     });

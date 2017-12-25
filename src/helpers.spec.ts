@@ -5,6 +5,7 @@ describe('Helpers', () => {
   describe('is', () => {
     it('should check type', () => {
       expect(is('', 'String')).toBe(true);
+      expect(is(1, 'String')).toBe(false);
     });
   });
 
@@ -14,6 +15,7 @@ describe('Helpers', () => {
       const reversed = reverse(original);
       expect(reversed).toEqual([4, 3, 2, 1]);
       expect(original).toEqual([1, 2, 3, 4]);
+      expect(reverse()).toEqual([]);
     });
   });
 

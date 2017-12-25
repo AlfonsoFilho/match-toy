@@ -6,21 +6,36 @@
     "lib": [
       "es2015"
     ],
-    "pretty": true,
-    
+    "declaration": true,
+    "outDir": "dist/es5",
+    "declarationDir": "dist/types",
     "importHelpers": true,
     "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
     "noImplicitThis": true,
-    "alwaysStrict": true,
-
+    "alwaysStrict": true,    
     "downlevelIteration": true,
-    "isolatedModules": true,
+    "allowJs": false,
 
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
-  }
+    "noFallthroughCasesInSwitch": true,
+
+    "sourceMap": true,
+
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  },
+  "include": [
+    "src/**.ts"
+  ],
+  "exclude": [
+    "src/**.spec.ts"
+  ]
 }
