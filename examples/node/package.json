@@ -1,0 +1,12 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "match-ish": "../.."
+  },
+  "devDependencies": {
+    "standard-version": "4.2.0"
+  }
+}

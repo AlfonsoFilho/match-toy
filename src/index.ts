@@ -1,1 +1,1 @@
-export * from './like-a-glove';
+export * from './api';

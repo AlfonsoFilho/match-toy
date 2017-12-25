@@ -1,3 +1,6 @@
+/**
+ * @module API
+ */
 // TYPE
 export type MatchSucess = [ true, {[key: string]: any} ];
 export type MatchFail = [ false, {[key: string]: any} ];
@@ -30,9 +33,9 @@ export interface AstNode {
 }
 
 export interface MatchItem {
-  pattern: Pattern | string | number | object | any[];
-  predicate: AnyFn | undefined;
-  guard: BoolFn;
+  pattern: Pattern;
+  predicate?: AnyFn;
+  guard?: BoolFn;
 }
 
 export enum AstType {
@@ -47,4 +50,10 @@ export enum AstType {
   AS = 'AS',
   AND = 'AND',
   OR = 'OR'
+}
+
+export enum ErrorMessages {
+  NO_PATTERN_DEFINED = 'No pattern defined',
+  ONE_GUARD_PER_PATTERN = 'Only one guard per rule allowed',
+  MISSING_PREDICATE = 'Missing callback function'
 }
