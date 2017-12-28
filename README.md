@@ -2,16 +2,6 @@
 The pattern matching library for javascript
 ---
 
-bsdges:
-- https://greenkeeper.io/#pricing
-- travis
-- https://codeclimate.com/
-- coverage
-codecov
-- https://gemnasium.com/
-https://github.com/ngryman/badge-size
----
-
 ## What is it?
 Match-ish is a pattern matching library for JavaScript. [Pattern matching](https://en.wikipedia.org/wiki/Pattern_matching) is a way to check a sequence of a given input against a specific expected pattern. Many languages like Elixir/Erlang, Rust, F#, Elm, Haskell or Scala have this as a built-in feature.
 
@@ -452,13 +442,3 @@ $ npm run lint
 ## Licence
 
 ## Changelog
- 
-## TODO
-```javascript
-// [...]:Customers -> { type: 'customer', name, ...rest }
-// s = [ 2 * x | x <- [0..], x > 3 ]
-//      output   it    list  predicate
-//     .with('[...] ->  { name }').do(() => void)
-
-  └┘├│─
-```
