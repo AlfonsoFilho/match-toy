@@ -1,6 +1,7 @@
 # Match-ish
 The pattern matching library for javascript
 ---
+[![Build Status](https://travis-ci.org/AlfonsoFilho/match-ish.svg?branch=master)](https://travis-ci.org/AlfonsoFilho/match-ish)
 
 ## What is it?
 Match-ish is a pattern matching library for JavaScript. [Pattern matching](https://en.wikipedia.org/wiki/Pattern_matching) is a way to check a sequence of a given input against a specific expected pattern. Many languages like Elixir/Erlang, Rust, F#, Elm, Haskell or Scala have this as a built-in feature.
