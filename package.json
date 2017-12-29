@@ -9,7 +9,7 @@
   ],
   "main": "./dist/es5/index.js",
   "jsnext:main": "./dist/es6/index.js",
-  "browser": "./dist/bundle/index.js",
+  "browser": "./dist/bundle/index.min.js",
   "types": "./dist/types/index.d.ts",
   "scripts": {
     "ci": "run-s clean lint build:grammar test:coverage build:bundle build:es5 build:es6",

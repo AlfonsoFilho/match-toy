@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prestart": "yarn --no-lockfile || npm install",
     "start": "parcel index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,7 +16,7 @@
     "parcel-bundler": "1.3.1"
   },
   "dependencies": {
-    "match-ish": "../..",
+    "match-ish": ">=0.0.0",
     "react": "16.2.0",
     "react-dom": "16.2.0"
   }
