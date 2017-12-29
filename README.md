@@ -1,13 +1,13 @@
 # Match-ish
 
-The pattern matching library for javascript
+The pattern matching library for javascript.
 ---
 [![Build Status](https://travis-ci.org/AlfonsoFilho/match-ish.svg?branch=master)](https://travis-ci.org/AlfonsoFilho/match-ish)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/7ab1573ab933cb598594/test_coverage)](https://codeclimate.com/github/AlfonsoFilho/match-ish/test_coverage)
 [![Greenkeeper badge](https://badges.greenkeeper.io/AlfonsoFilho/match-ish.svg)](https://greenkeeper.io/)
 
 ## What is it?
-Match-ish is a pattern matching library for JavaScript. [Pattern matching](https://en.wikipedia.org/wiki/Pattern_matching) is a way to check a sequence of a given input against a specific expected pattern. Many languages like Elixir/Erlang, Rust, F#, Elm, Haskell or Scala have this as a built-in feature.
+Match-ish is a pattern matching library for JavaScript. [Pattern matching](https://en.wikipedia.org/wiki/Pattern_matching) is a way to check a sequence of a given input against one or more specific patterns. Many languages like Elixir/Erlang, Rust, F#, Elm, Haskell or Scala have this as a built-in feature.
 
 Pattern matching is a very powerful concept and Match-ish is an attempt to bring this to javascript with an elegant and familiar syntax (jQuery-like chains) plus a simple [domain specific language](#dsl).
 
@@ -439,10 +439,9 @@ $ npm run lint
 - Translating.
 - Finding bugs
 - Sharing this project
-## Known bugs
 
-## Troubleshooting
-
-## Licence
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ## Changelog
+See [CHANGELOG](CHANGELOG.md) file for details.

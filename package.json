@@ -1,6 +1,6 @@
 {
   "name": "match-ish",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "The pattern matching library for javascript",
   "keywords": [
     "pattern matching"
@@ -21,7 +21,8 @@
     "build:bundleu": "rollup -c && uglifyjs dist/bundle/index.js",
     "lint": "tslint -e '**/*.gen.ts' --fix --format stylish --project .",
     "test:coverage": "jest --coverage",
-    "test:watch": "jest --watchAll"
+    "test:watch": "jest --watchAll",
+    "release": "standard-version"
   },
   "repository": {
     "type": "git",
