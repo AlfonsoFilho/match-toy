@@ -35,7 +35,7 @@
   "license": "ISC",
   "dependencies": {},
   "devDependencies": {
-    "@types/jest": "21.1.10",
+    "@types/jest": "22.0.0",
     "@types/node": "8.5.2",
     "jest": "22.0.4",
     "jest-cli": "22.0.4",
