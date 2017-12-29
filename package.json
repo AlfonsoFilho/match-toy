@@ -29,7 +29,8 @@
   "repository": "github:AlfonsoFilho/match-ish",
   "bugs": "https://github.com/AlfonsoFilho/match-ish/issues",
   "files": [
-    "dist"
+    "dist",
+    "examples/runkit"
   ],
   "author": "Alfonso Filho <alfonsocfilho@gmail.com>",
   "license": "MIT",
