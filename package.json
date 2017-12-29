@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "description": "The pattern matching library for javascript",
   "keywords": [
-    "pattern matching"
+    "pattern-matching",
+    "functional",
+    "pattern"
   ],
   "main": "./dist/es5/index.js",
   "jsnext:main": "./dist/es6/index.js",
@@ -18,23 +20,19 @@
     "build:es6": "tsc -p tsconfig.es6.json",
     "build:es5": "tsc -p tsconfig.es5.json",
     "build:bundle": "rollup -c",
-    "build:bundleu": "rollup -c && uglifyjs dist/bundle/index.js",
     "lint": "tslint -e '**/*.gen.ts' --fix --format stylish --project .",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watchAll",
-    "release": "standard-version"
+    "release": "standard-version",
+    "prepare": "run-s ci"
   },
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
-  "bugs": {},
+  "repository": "github:AlfonsoFilho/match-ish",
+  "bugs": "https://github.com/AlfonsoFilho/match-ish/issues",
   "files": [
     "dist"
   ],
   "author": "Alfonso Filho <alfonsocfilho@gmail.com>",
-  "license": "ISC",
-  "dependencies": {},
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "22.0.0",
     "@types/node": "8.5.2",
@@ -87,5 +85,6 @@
         "statements": 90
       }
     }
-  }
+  },
+  "runkitExampleFilename": "examples/runkit/index.js"
 }

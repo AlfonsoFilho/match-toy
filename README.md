@@ -1,10 +1,11 @@
 # Match-ish
 
-The pattern matching library for javascript.
----
+
 [![Build Status](https://travis-ci.org/AlfonsoFilho/match-ish.svg?branch=master)](https://travis-ci.org/AlfonsoFilho/match-ish)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/7ab1573ab933cb598594/test_coverage)](https://codeclimate.com/github/AlfonsoFilho/match-ish/test_coverage)
 [![Greenkeeper badge](https://badges.greenkeeper.io/AlfonsoFilho/match-ish.svg)](https://greenkeeper.io/)
+[![Try match-ish on RunKit](https://badge.runkitcdn.com/match-ish.svg)](https://npm.runkit.com/match-ish)
+> The pattern matching library for javascript.
 
 ## What is it?
 Match-ish is a pattern matching library for JavaScript. [Pattern matching](https://en.wikipedia.org/wiki/Pattern_matching) is a way to check a sequence of a given input against one or more specific patterns. Many languages like Elixir/Erlang, Rust, F#, Elm, Haskell or Scala have this as a built-in feature.
@@ -20,6 +21,8 @@ With Match-ish, you'll be able to do:
 - [List splitting](#rest)
 - [Logical Pattern](#logical-or)
 - [As Pattern](#as)
+
+[Try it now](https://npm.runkit.com/match-ish), then check out how to [install](#install) and [use](#usage).
 
 #### Interesting but...
 If do you think this looks like an overengineering `switch..case`, let's compare some code then you make your mind.
@@ -438,10 +441,10 @@ $ npm run lint
 - Improving or correcting the documentation.
 - Translating.
 - Finding bugs
-- Sharing this project
+- Sharing this project.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Changelog
 See [CHANGELOG](CHANGELOG.md) file for details.
