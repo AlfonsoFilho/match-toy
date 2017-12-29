@@ -22,7 +22,7 @@ export default {
   output: {
     file: 'dist/bundle/index.min.js',
     format: 'umd',
-    name: 'match-ish',
+    name: 'matchIsh',
     sourcemap: true
   }
 };

@@ -1,1 +1,1 @@
-export * from './api';
+export { match } from './api';
