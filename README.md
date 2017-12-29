@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/AlfonsoFilho/match-ish.svg?branch=master)](https://travis-ci.org/AlfonsoFilho/match-ish)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/7ab1573ab933cb598594/test_coverage)](https://codeclimate.com/github/AlfonsoFilho/match-ish/test_coverage)
 [![Greenkeeper badge](https://badges.greenkeeper.io/AlfonsoFilho/match-ish.svg)](https://greenkeeper.io/)
+[![npm version](https://badge.fury.io/js/match-ish.svg)](https://badge.fury.io/js/match-ish)
 [![Try match-ish on RunKit](https://badge.runkitcdn.com/match-ish.svg)](https://npm.runkit.com/match-ish)
 > The pattern matching library for javascript.
 
@@ -22,7 +23,7 @@ With Match-ish, you'll be able to do:
 - [Logical Pattern](#logical-or)
 - [As Pattern](#as)
 
-[Try it now](https://npm.runkit.com/match-ish), then check out how to [install](#install) and [use](#usage).
+[Try it now](https://npm.runkit.com/match-ish), then check out how to [install](#install) and [use](#usage) it.
 
 #### Interesting but...
 If do you think this looks like an overengineering `switch..case`, let's compare some code then you make your mind.
@@ -95,8 +96,6 @@ Did you notice the difference in terms of readability and maintainability? That'
 - [DSL](#dsl)
 
 A good way to learn is by example. So the best kick off is [read the tests](./src), there are tons of them covering all the cases. Another source is the [examples](./examples) folder, especially the [tic-tac-toe](./examples/tic-tac-toe).
-### Prerequisites
-- NodeJS
 
 ### Install
 ```sh
