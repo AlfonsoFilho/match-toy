@@ -1,6 +1,6 @@
 {
   "name": "match-ish",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "The pattern matching library for javascript",
   "keywords": [
     "pattern-matching",
