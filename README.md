@@ -98,9 +98,37 @@ Did you notice the difference in terms of readability and maintainability? That'
 A good way to learn is by example. So the best kick off is [read the tests](./src), there are tons of them covering all the cases. Another source is the [examples](./examples) folder, especially the [tic-tac-toe](./examples/tic-tac-toe).
 
 ### Install
+
+#### From NPM
 ```sh
 $ npm install match-ish --save
 ```
+Or yarn:
+```sh
+$ yarn add match-ish
+```
+Then import/require the module.
+```javascript
+const { match } = require('match-ish');
+// or
+import { match } from 'match-ish';
+```
+
+#### From CDN
+Place the snippet into your html:
+```html
+<script src="https://cdn.jsdelivr.net/npm/match-ish/dist/bundle/index.min.js"></script>
+```
+For specific version append the desired version (on the format `@x.x.x`) before the word `match-ish` just like this:   `https://cdn.jsdelivr.net/npm/match-ish@1.0.0/dist/bundle/index.min.js`.
+
+This file is a bundle in the [UMD](https://github.com/umdjs/umd) format. In browser's environments, the module name is in camelcase and available on `window` scope.
+```javascript
+var myFunc = matchIsh.match()
+                      .with('1', () => 'one')
+                      .end()
+```
+
+See more in [examples](./examples).
 
 ### Usage
 Most basic usage:
