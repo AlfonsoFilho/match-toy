@@ -20,7 +20,7 @@ export default {
     filesize()
   ],
   output: {
-    file: 'dist/bundle/index.js',
+    file: 'dist/bundle/index.min.js',
     format: 'umd',
     name: 'match-ish',
     sourcemap: true
