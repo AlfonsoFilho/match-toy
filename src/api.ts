@@ -95,3 +95,4 @@ export class Matcher {
 }
 
 export const match = (...args: any[]) => new Matcher(args);
+export default match;
