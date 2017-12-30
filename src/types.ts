@@ -49,7 +49,8 @@ export enum AstType {
   RANGE = 'RANGE',
   AS = 'AS',
   AND = 'AND',
-  OR = 'OR'
+  OR = 'OR',
+  REGEXP = 'REGEXP'
 }
 
 export enum ErrorMessages {

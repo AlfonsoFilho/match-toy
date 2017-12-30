@@ -51,6 +51,7 @@
     / object
     / bind
     / typed
+    / regex
 
   range
     = ws start:range_item '..' end:range_item ws {
@@ -156,9 +157,14 @@
         typeOf
       }
     }
-
-
-
+  
+  regex "regular expression"
+    = ws '/' r:[a-zA-Z0-9&_\-^{}()\[\],.*\\+?$!:=|]* '/' ws {
+    	return {
+          type: 'REGEXP',
+          value: new RegExp(r.join(''));
+        }
+    }
 
 
 
