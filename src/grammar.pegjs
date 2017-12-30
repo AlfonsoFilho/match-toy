@@ -162,7 +162,7 @@
     = ws '/' r:[a-zA-Z0-9&_\-^{}()\[\],.*\\+?$!:=|]* '/' ws {
     	return {
           type: 'REGEXP',
-          value: new RegExp(r.join(''));
+          value: new RegExp(r.join(''))
         }
     }
 
