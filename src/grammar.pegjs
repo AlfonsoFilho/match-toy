@@ -212,6 +212,7 @@
     / 'Object'
     / 'Function'
     / 'RegExp'
+    / 'Date'
     / instance
 
   char

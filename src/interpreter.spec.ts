@@ -735,11 +735,18 @@ describe('Interpreter', () => {
         expect(interpreter(pattern, [() => {/**/}])).toEqual([true, {}]);
       });
 
-      it('should match if is Function', () => {
+      it('should match if is RegExp', () => {
         // with('RegExp', () => 'code')
         // with('_:RegExp', () => 'code')
         pattern = compile('RegExp');
         expect(interpreter(pattern, [/a-z/])).toEqual([true, {}]);
+      });
+
+      it('should match if is Date', () => {
+        // with('Date', () => 'code')
+        // with('_:Date', () => 'code')
+        pattern = compile('Date');
+        expect(interpreter(pattern, [new Date()])).toEqual([true, {}]);
       });
 
       it('should match if is Nullable', () => {
