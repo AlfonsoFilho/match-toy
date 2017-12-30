@@ -21,6 +21,7 @@ With Match-ish, you'll be able to do:
 - [Range Pattern](#range)
 - [List splitting](#rest)
 - [Mapping Pattern](#mapping)
+- [RegExp Pattern](#regexp)
 - [Logical Pattern](#logical-or)
 - [As Pattern](#as)
 
@@ -322,7 +323,7 @@ The literal pattern is used when an equal value match is expected.
 .with('true, "text", { a: 1 }, [true, true]') // sequence of mixed values
 ```
 #### Bind
-The bind pattern assigns the matched value to a variable. Naming variables can be done by lowercase letters or words only.
+The bind pattern assigns the matched value to a variable.
 ```javascript
 // Bind any value to variable 'x'
 .with('x')
@@ -390,6 +391,7 @@ Supported types:
 .with('Object')    // {}
 .with('Function')  // () => {/*code*/}
 .with('RegExp')    // /a-z/
+.with('Date')    // new Date()
 
 // Nullable is a special type. 
 .with('Nullable')  // {}, [], '', 0, undefined, null
@@ -440,11 +442,40 @@ The rest pattern, is very similar to the rest operator of Javascript.
 ```
 
 ### Mapping
+Mapping pattern allow us to define a pattern to be used over every item of an array or object. The is perfect when we need to filter and/or desconstruct a dataset. This is like an extension of the Rest pattern.
+```javascript
+const marvelCharacters = [
+  { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
+  { name: 'IronMan', alterEgo: 'Tony Stark', type: 'hero' },
+  { name: 'Doctor Doom', alterEgo: 'Victor Von Doom', type: 'villain' },
+  { name: 'Venom', alterEgo: 'Eddie Brock', type: 'villain' }
+ ];
+
+const getHeroes = match()
+  .with('[...characters({ name: hero, type: "hero", ... })]')
+    .do(({characters}) => characters)
+  .end();
+
+getHeroes(marvelCharacters);
+/*
+ the result will be:
+ [
+   { hero: 'Spiderman' },
+   { hero: 'IronMan' }
+ ]      
+*/
+```
+
+#### RegExp
+You can define regular expressions.
+```javascript
+.with('/^(http|https)/')
+```
 
 #### Logical Or
 With the operator `|` you can combine multiple patterns in order to match one of them.
 ```javascript
-.with('2 | 4 ') // will match either 2 or 4
+.with('2 | 4') // will match either 2 or 4
 .with('1, _ | 2, _ ')
 // Given 1, 2 match
 // Given 2, 8 match
@@ -531,22 +562,10 @@ $ npm run lint
 - Translating.
 - Finding bugs
 - Sharing this project.
+- PR are very welcome.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Changelog
 See [CHANGELOG](CHANGELOG.md) file for details.
-
-- [x] Parenteces
-- [-] REst patterns / typestruct {} - mapping a pattern over many values
-        // Rest patterns (mapping a pattern over many values)
-          [...{ x, y }] => _.zip(x, y),
-          [...var({  })]
-- [ ] Regex
-- [x] new types: RegExp
-- [ ] new types: Date, RegExp, Map
-- [ ] test names with uppercase
-- [ ] nice syntaax errors
-- [ ] Promise
-- [ ] rx

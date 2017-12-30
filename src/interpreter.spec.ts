@@ -7,7 +7,7 @@ describe('Interpreter', () => {
   const FAIL = [ false, {} ];
   let pattern;
 
-  describe('Constant pattern', () => {
+  describe('Literal pattern', () => {
 
     describe('when matching single numbers', () => {
       beforeEach(() => {
@@ -180,23 +180,17 @@ describe('Interpreter', () => {
 
   describe('Bind pattern', () => {
     describe('when matching single bind', () => {
-      beforeEach(() => {
+      it('should match', () => {
         // with('x', ({x}) => `x is equal to: ${x}`)
         pattern = compile('x');
-      });
-
-      it('should match', () => {
         expect(interpreter(pattern, [1])).toEqual([ true, {x: 1} ]);
       });
     });
 
     describe('when matching many binds', () => {
-      beforeEach(() => {
+      it('should match', () => {
         // with('x, y', ({x, y}) => `x is ${x} and y is ${y}`)
         pattern = compile('x, y');
-      });
-
-      it('should match', () => {
         expect(interpreter(pattern, [1, 2])).toEqual([ true, {x: 1, y: 2} ]);
       });
     });
@@ -311,7 +305,7 @@ describe('Interpreter', () => {
       });
     });
 
-    describe('when matching wildcard inner an object', () => {
+    describe('when matching wildcard inside an object', () => {
       beforeEach(() => {
         // with('{ a: 1, b: _, c: 1 }', () => x + y)
         pattern = compile('{ a: 1, b: _, c: 1 }');
@@ -403,7 +397,6 @@ describe('Interpreter', () => {
     describe('when matching head|tail list', () => {
       beforeEach(() => {
         // with('[head, ...tail]', ({head, tail}) => void)
-        // with('x:xs', ({x, xs}) => void)
         pattern = compile('[head, ...tail]');
       });
 
@@ -462,6 +455,58 @@ describe('Interpreter', () => {
       it('should not match', () => {
         expect(interpreter(pattern, [{}])).toEqual(FAIL);
       });
+    });
+  });
+
+  describe('Mapping pattern', () => {
+
+    it('should filter and desconstruct an array', () => {
+      pattern = compile('[...characters({ name: hero, type: "hero", ... })]');
+
+      expect(interpreter(pattern, [[
+        { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
+        { name: 'IronMan', alterEgo: 'Tony Stark', type: 'hero' },
+        { name: 'Doctor Doom', alterEgo: 'Victor Von Doom', type: 'villain' },
+        { name: 'Venom', alterEgo: 'Eddie Brock', type: 'villain' }
+      ]])).toEqual([true, {characters: [
+        { hero: 'Spiderman' },
+        { hero: 'IronMan' }
+      ]}]);
+    });
+
+    it('should filter and desconstruct an array with specific schema', () => {
+      pattern = compile('[...characters({ name: hero, type: "hero"})]');
+
+      expect(interpreter(pattern, [[
+        { name: 'Spiderman', type: 'hero' },
+        { name: 'IronMan', type: 'hero' },
+        { name: 'Doctor Doom', type: 'villain' },
+        { name: 'Venom', type: 'villain' }
+      ]])).toEqual([true, {characters: [
+        { hero: 'Spiderman' },
+        { hero: 'IronMan' }
+      ]}]);
+
+      expect(interpreter(pattern, [[
+        { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
+        { name: 'IronMan', alterEgo: 'Tony Stark', type: 'hero' },
+        { name: 'Doctor Doom', alterEgo: 'Victor Von Doom', type: 'villain' },
+        { name: 'Venom', alterEgo: 'Eddie Brock', type: 'villain' }
+      ]])).toEqual(FAIL);
+    });
+
+    it('should filter and desconstruct an object', () => {
+      pattern = compile('{...characters({ alterEgo: name, type: "hero"})}');
+
+      expect(interpreter(pattern, [{
+        'Spiderman': {alterEgo: 'Peter Parker', type: 'hero' },
+        'IronMan': { alterEgo: 'Tony Stark', type: 'hero' },
+        'Doctor Doom': { alterEgo: 'Victor Von Doom', type: 'villain' },
+        'Venom': { alterEgo: 'Eddie Brock', type: 'villain' }
+      }])).toEqual([true, {characters: {
+        Spiderman: { name: 'Peter Parker'},
+        IronMan: { name: 'Tony Stark' }
+      } }]);
     });
   });
 
@@ -560,92 +605,102 @@ describe('Interpreter', () => {
     });
   });
 
-  describe('Or pattern', () => {
-    describe('when matching one of the patterns', () => {
-      beforeEach(() => {
-        // with('2 | "two"', () => 'equal to two')
-        pattern = compile('2 | "two"');
+  describe('Logical pattern', () => {
+    describe('Logical Or pattern', () => {
+      describe('when matching one of the patterns', () => {
+        beforeEach(() => {
+          // with('2 | "two"', () => 'equal to two')
+          pattern = compile('2 | "two"');
+        });
+  
+        it('should match', () => {
+          expect(interpreter(pattern, [2])).toEqual([true, {}]);
+          expect(interpreter(pattern, ['two'])).toEqual([true, {}]);
+        });
+  
+        it('should not match', () => {
+          expect(interpreter(pattern, [4])).toEqual(FAIL);
+          expect(interpreter(pattern, [2, 1])).toEqual(FAIL);
+        });
       });
-
-      it('should match', () => {
-        expect(interpreter(pattern, [2])).toEqual([true, {}]);
-        expect(interpreter(pattern, ['two'])).toEqual([true, {}]);
+  
+      describe('when matching with bind patterns', () => {
+        beforeEach(() => {
+          // with('2 | "two", x', () => 'equal to two')
+          pattern = compile('2 | "two", x');
+        });
+  
+        it('should match', () => {
+          expect(interpreter(pattern, [2])).toEqual([true, {}]);
+          expect(interpreter(pattern, ['two', 3])).toEqual([true, { x: 3 }]);
+        });
+  
+        it('should not match', () => {
+          expect(interpreter(pattern, [4])).toEqual(FAIL);
+          expect(interpreter(pattern, [2, 1])).toEqual(FAIL);
+          expect(interpreter(pattern, ['two', 3, 2])).toEqual(FAIL);
+        });
       });
-
-      it('should not match', () => {
-        expect(interpreter(pattern, [4])).toEqual(FAIL);
-        expect(interpreter(pattern, [2, 1])).toEqual(FAIL);
+  
+      describe('when matching nesting OR patterns', () => {
+        beforeEach(() => {
+          // with('1 | 2 | 3', () => 'equal to two')
+          pattern = compile('1 | 2 | 3');
+        });
+  
+        it('should match', () => {
+          expect(interpreter(pattern, [1])).toEqual([true, {}]);
+          expect(interpreter(pattern, [2])).toEqual([true, {}]);
+          expect(interpreter(pattern, [3])).toEqual([true, {}]);
+        });
+  
+        it('should not match', () => {
+          expect(interpreter(pattern, [4])).toEqual(FAIL);
+        });
+      });
+  
+    });
+  
+    describe('Logical And pattern', () => {
+      describe('when matching all the patterns', () => {
+        beforeEach(() => {
+          // with('2, x & _, 1', () => 'equal to two')
+          pattern = compile('2, x & _, 1');
+        });
+  
+        it('should match', () => {
+          expect(interpreter(pattern, [2, 1])).toEqual([true, { x: 1 }]);
+        });
+  
+        it('should not match', () => {
+          expect(interpreter(pattern, [2, 2])).toEqual(FAIL);
+          expect(interpreter(pattern, [2])).toEqual(FAIL);
+        });
+      });
+  
+      describe('when matching nesting AND the patterns', () => {
+        beforeEach(() => {
+          // with('2, x, _ & _, 1, y & _, _, 3', () => 'equal to two')
+          pattern = compile('2, x, _ & _, 1, y & _, _, 3');
+        });
+  
+        it('should match', () => {
+          expect(interpreter(pattern, [2, 1, 3])).toEqual([true, { x: 1, y: 3 }]);
+        });
+  
+        it('should not match', () => {
+          expect(interpreter(pattern, [1, 1, 1])).toEqual(FAIL);
+          expect(interpreter(pattern, [2, 2])).toEqual(FAIL);
+          expect(interpreter(pattern, [2])).toEqual(FAIL);
+        });
       });
     });
-
-    describe('when matching with bind patterns', () => {
-      beforeEach(() => {
-        // with('2 | "two", x', () => 'equal to two')
-        pattern = compile('2 | "two", x');
-      });
-
-      it('should match', () => {
-        expect(interpreter(pattern, [2])).toEqual([true, {}]);
-        expect(interpreter(pattern, ['two', 3])).toEqual([true, { x: 3 }]);
-      });
-
-      it('should not match', () => {
-        expect(interpreter(pattern, [4])).toEqual(FAIL);
-        expect(interpreter(pattern, [2, 1])).toEqual(FAIL);
-        expect(interpreter(pattern, ['two', 3, 2])).toEqual(FAIL);
-      });
-    });
-
-    describe('when matching nesting OR patterns', () => {
-      beforeEach(() => {
-        // with('1 | 2 | 3', () => 'equal to two')
-        pattern = compile('1 | 2 | 3');
-      });
-
-      it('should match', () => {
-        expect(interpreter(pattern, [1])).toEqual([true, {}]);
-        expect(interpreter(pattern, [2])).toEqual([true, {}]);
-        expect(interpreter(pattern, [3])).toEqual([true, {}]);
-      });
-
-      it('should not match', () => {
-        expect(interpreter(pattern, [4])).toEqual(FAIL);
-      });
-    });
-
-  });
-
-  describe('And pattern', () => {
-    describe('when matching all the patterns', () => {
-      beforeEach(() => {
-        // with('2, x & _, 1', () => 'equal to two')
-        pattern = compile('2, x & _, 1');
-      });
-
-      it('should match', () => {
-        expect(interpreter(pattern, [2, 1])).toEqual([true, { x: 1 }]);
-      });
-
-      it('should not match', () => {
-        expect(interpreter(pattern, [2, 2])).toEqual(FAIL);
-        expect(interpreter(pattern, [2])).toEqual(FAIL);
-      });
-    });
-
-    describe('when matching nesting AND the patterns', () => {
-      beforeEach(() => {
-        // with('2, x, _ & _, 1, y & _, _, 3', () => 'equal to two')
-        pattern = compile('2, x, _ & _, 1, y & _, _, 3');
-      });
-
-      it('should match', () => {
-        expect(interpreter(pattern, [2, 1, 3])).toEqual([true, { x: 1, y: 3 }]);
-      });
-
-      it('should not match', () => {
-        expect(interpreter(pattern, [1, 1, 1])).toEqual(FAIL);
-        expect(interpreter(pattern, [2, 2])).toEqual(FAIL);
-        expect(interpreter(pattern, [2])).toEqual(FAIL);
+  
+    describe('Logical patters', () => {
+      it('should match a combination fo and and or patterns', () => {
+        pattern = compile('1, 2 | 4, 2 & _, x');
+        expect(interpreter(pattern, [1, 2])).toEqual([true, {x: 2}]);
+        expect(interpreter(pattern, [4, 2])).toEqual([true, {x: 2}]);
       });
     });
   });
@@ -660,14 +715,6 @@ describe('Interpreter', () => {
       it('should match', () => {
         expect(interpreter(pattern, [1, 2])).toEqual([true, { x: 1, y: 2, z: [1, 2] }]);
       });
-    });
-  });
-
-  describe('Logical patters', () => {
-    it('should match a combination fo and and or patterns', () => {
-      pattern = compile('1, 2 | 4, 2 & _, x');
-      expect(interpreter(pattern, [1, 2])).toEqual([true, {x: 2}]);
-      expect(interpreter(pattern, [4, 2])).toEqual([true, {x: 2}]);
     });
   });
 
@@ -807,72 +854,19 @@ describe('Interpreter', () => {
         expect(interpreter(pattern, [1])).toEqual(FAIL);
       });
     });
-  });
 
-  describe('Regex Pattern', () => {
-    it('should match', () => {
-      pattern = compile('/^http/');
-      expect(JSON.stringify(interpreter(pattern, ['http://www.google.com'])))
-        .toEqual(JSON.stringify([true, { result: ['http'] }]));
-    });
-  });
+    describe('Regex Pattern', () => {
+      it('should match', () => {
+        pattern = compile('/^http/');
+        expect(JSON.stringify(interpreter(pattern, ['http://www.google.com'])))
+          .toEqual(JSON.stringify([true, { result: ['http'] }]));
+      });
 
-  describe('Mapping pattern', () => {
-
-    it('should here', () => {
-      pattern = compile('[...characters({ name: hero, type: "hero", ... })]');
-
-      expect(interpreter(pattern, [[
-        { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
-        { name: 'IronMan', alterEgo: 'Tony Stark', type: 'hero' },
-        { name: 'Doctor Doom', alterEgo: 'Victor Von Doom', type: 'villain' },
-        { name: 'Venom', alterEgo: 'Eddie Brock', type: 'villain' }
-      ]])).toEqual([true, {characters: [
-        { hero: 'Spiderman' },
-        { hero: 'IronMan' }
-      ]}]);
-    });
-
-    it('should here', () => {
-      pattern = compile('[...characters({ name: hero, type: "hero"})]');
-
-      expect(interpreter(pattern, [[
-        { name: 'Spiderman', type: 'hero' },
-        { name: 'IronMan', type: 'hero' },
-        { name: 'Doctor Doom', type: 'villain' },
-        { name: 'Venom', type: 'villain' }
-      ]])).toEqual([true, {characters: [
-        { hero: 'Spiderman' },
-        { hero: 'IronMan' }
-      ]}]);
-    });
-
-    it('should here', () => {
-      pattern = compile('[...characters({ name: hero, type: "hero"})]');
-
-      expect(interpreter(pattern, [[
-        { name: 'Spiderman', type: 'hero' },
-        { name: 'IronMan', type: 'hero' },
-        { name: 'Doctor Doom', type: 'villain' },
-        { name: 'Venom', type: 'villain' }
-      ]])).toEqual([true, {characters: [
-        { hero: 'Spiderman' },
-        { hero: 'IronMan' }
-      ]}]);
-    });
-
-    it('should here', () => {
-      pattern = compile('{...characters({ alterego: name, type: "hero"})}');
-
-      expect(interpreter(pattern, [{
-        'Spiderman': {alterego: 'Peter Parker', type: 'hero' },
-        'IronMan': { alterego: 'Tony Stark', type: 'hero' },
-        'Doctor Doom': { alterego: 'Victor Von Doom', type: 'villain' },
-        'Venom': { alterego: 'Eddie Brock', type: 'villain' }
-      }])).toEqual([true, {characters: {
-        Spiderman: { name: 'Peter Parker'},
-        IronMan: { name: 'Tony Stark' }
-      } }]);
+      it('should not match', () => {
+        pattern = compile('/^http/');
+        expect(JSON.stringify(interpreter(pattern, ['www.google.com'])))
+          .toEqual(JSON.stringify(FAIL));
+      });
     });
   });
 
