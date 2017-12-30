@@ -860,4 +860,12 @@ describe('Interpreter', () => {
       } }]);
     });
   });
+
+  describe('Errors', () => {
+    it('should throw a error with a friendly message', () => {
+      expect(() => {
+        compile('1x');
+      }).toThrowError(expect.stringMatching('Match-ish Syntax Error'));
+    });
+  });
 });
