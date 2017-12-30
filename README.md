@@ -25,6 +25,8 @@ With Match-ish, you'll be able to do:
 - [Logical Pattern](#logical-or)
 - [As Pattern](#as)
 
+All this in about 7kb gzip.
+
 [Try it now](https://npm.runkit.com/match-ish), then check out how to [install](#install) and [use](#usage) it.
 
 #### Interesting but...
