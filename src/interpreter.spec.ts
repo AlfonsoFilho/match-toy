@@ -809,6 +809,14 @@ describe('Interpreter', () => {
     });
   });
 
+  describe('Regex Pattern', () => {
+    it('should match', () => {
+      pattern = compile('/^http/');
+      expect(JSON.stringify(interpreter(pattern, ['http://www.google.com'])))
+        .toEqual(JSON.stringify([true, { result: ['http'] }]));
+    });
+  });
+
   describe('Mapping pattern', () => {
 
     it('should here', () => {

@@ -225,6 +225,15 @@ const nodeReader: {[key: string]: any } = {
     } else {
       return FAIL;
     }
+  },
+
+  [AstType.REGEXP]: (input: string, node: AstNode): MatchResult => {
+    const result = input.match(node.value);
+    if (result) {
+      return [ true, { result } ];
+    } else {
+      return FAIL;
+    }
   }
 };
 
