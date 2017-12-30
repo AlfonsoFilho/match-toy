@@ -735,6 +735,13 @@ describe('Interpreter', () => {
         expect(interpreter(pattern, [() => {/**/}])).toEqual([true, {}]);
       });
 
+      it('should match if is Function', () => {
+        // with('RegExp', () => 'code')
+        // with('_:RegExp', () => 'code')
+        pattern = compile('RegExp');
+        expect(interpreter(pattern, [/a-z/])).toEqual([true, {}]);
+      });
+
       it('should match if is Nullable', () => {
         // with('Nullable', () => 'code')
         // with('_:Nullable', () => 'code')
@@ -792,6 +799,65 @@ describe('Interpreter', () => {
       it('should not match', () => {
         expect(interpreter(pattern, [1])).toEqual(FAIL);
       });
+    });
+  });
+
+  describe('Mapping pattern', () => {
+
+    it('should here', () => {
+      pattern = compile('[...characters({ name: hero, type: "hero", ... })]');
+
+      expect(interpreter(pattern, [[
+        { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
+        { name: 'IronMan', alterEgo: 'Tony Stark', type: 'hero' },
+        { name: 'Doctor Doom', alterEgo: 'Victor Von Doom', type: 'villain' },
+        { name: 'Venom', alterEgo: 'Eddie Brock', type: 'villain' }
+      ]])).toEqual([true, {characters: [
+        { hero: 'Spiderman' },
+        { hero: 'IronMan' }
+      ]}]);
+    });
+
+    it('should here', () => {
+      pattern = compile('[...characters({ name: hero, type: "hero"})]');
+
+      expect(interpreter(pattern, [[
+        { name: 'Spiderman', type: 'hero' },
+        { name: 'IronMan', type: 'hero' },
+        { name: 'Doctor Doom', type: 'villain' },
+        { name: 'Venom', type: 'villain' }
+      ]])).toEqual([true, {characters: [
+        { hero: 'Spiderman' },
+        { hero: 'IronMan' }
+      ]}]);
+    });
+
+    it('should here', () => {
+      pattern = compile('[...characters({ name: hero, type: "hero"})]');
+
+      expect(interpreter(pattern, [[
+        { name: 'Spiderman', type: 'hero' },
+        { name: 'IronMan', type: 'hero' },
+        { name: 'Doctor Doom', type: 'villain' },
+        { name: 'Venom', type: 'villain' }
+      ]])).toEqual([true, {characters: [
+        { hero: 'Spiderman' },
+        { hero: 'IronMan' }
+      ]}]);
+    });
+
+    it('should here', () => {
+      pattern = compile('{...characters({ alterego: name, type: "hero"})}');
+
+      expect(interpreter(pattern, [{
+        'Spiderman': {alterego: 'Peter Parker', type: 'hero' },
+        'IronMan': { alterego: 'Tony Stark', type: 'hero' },
+        'Doctor Doom': { alterego: 'Victor Von Doom', type: 'villain' },
+        'Venom': { alterego: 'Eddie Brock', type: 'villain' }
+      }])).toEqual([true, {characters: {
+        Spiderman: { name: 'Peter Parker'},
+        IronMan: { name: 'Tony Stark' }
+      } }]);
     });
   });
 });

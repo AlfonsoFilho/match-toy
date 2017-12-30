@@ -14,12 +14,13 @@ Match-ish is a pattern matching library for JavaScript. [Pattern matching](https
 Pattern matching is a very powerful concept and Match-ish is an attempt to bring this to javascript with an elegant and familiar syntax (jQuery-like chains) plus a simple [domain specific language](#dsl).
 
 With Match-ish, you'll be able to do:
-- [Literal Patterns](#literal)
-- [Bind Patterns](#bind)
-- [Typed Patterns](#typed)
-- [Wildcard Patterns](#wildcard)
+- [Literal Pattern](#literal)
+- [Bind Pattern](#bind)
+- [Typed Pattern](#typed)
+- [Wildcard Pattern](#wildcard)
 - [Range Pattern](#range)
 - [List splitting](#rest)
+- [Mapping Pattern](#mapping)
 - [Logical Pattern](#logical-or)
 - [As Pattern](#as)
 
@@ -388,6 +389,7 @@ Supported types:
 .with('Array')     // []
 .with('Object')    // {}
 .with('Function')  // () => {/*code*/}
+.with('RegExp')    // /a-z/
 
 // Nullable is a special type. 
 .with('Nullable')  // {}, [], '', 0, undefined, null
@@ -436,6 +438,9 @@ The rest pattern, is very similar to the rest operator of Javascript.
 // Match an object with one or more items
 .with('{ ... }')
 ```
+
+### Mapping
+
 #### Logical Or
 With the operator `|` you can combine multiple patterns in order to match one of them.
 ```javascript
@@ -532,3 +537,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Changelog
 See [CHANGELOG](CHANGELOG.md) file for details.
+
+- [x] Parenteces
+- [-] REst patterns / typestruct {} - mapping a pattern over many values
+        // Rest patterns (mapping a pattern over many values)
+          [...{ x, y }] => _.zip(x, y),
+          [...var({  })]
+- [ ] Regex
+- [x] new types: RegExp
+- [ ] new types: Date, RegExp, Map
+- [ ] test names with uppercase
+- [ ] nice syntaax errors
+- [ ] Promise
+- [ ] rx
