@@ -1,86 +1,209 @@
-AST = ws ast:root ws { return {
-  __meta__: {
-    version: 1
-  },
-	root: ast
-} }
-
-
-dot             = '.'
-digit           = [0-9]+
-float           = minus? digit dot? digit?
-rest_symbol     = '...'
-rest            = ws rest_symbol b:word? { return { type: 'REST', name: b } }
-range_symbol    = '..'
-range_item      = minus? digit / [a-z] / [A-Z]
-range           = ws start:range_item range_symbol end:range_item ws { return { type: 'RANGE', start: typeof start === 'string' ? start : parseFloat([].concat(...start).join('')), end: typeof end === 'string' ? end : parseFloat([].concat(...end).join('')) } }
-colon           = ':'
-and             = ws '&' ws
-or              = ws '|' ws
-minus           = ws '-'
-comma           = ws ',' ws
-quote           = '"'
-true            = 'true'
-false           = ws 'false' ws
-as              = ws 'as' ws
-bracket_open    = ws '[' ws
-bracket_close   = ws ']' ws
-curly_open      = ws '{' ws
-curly_close     = ws '}' ws
-word            = [a-z]+ { return text() }
-type_bool       = 'Boolean'
-type_string     = 'String'
-type_number     = 'Number'
-type_undefined  = 'Undefined'
-type_null       = 'Null'
-type_array      = 'Array'
-type_object     = 'Object'
-type_function   = 'Function'
-type_nullable   = 'Nullable'
-instance        = [A-Z][a-z]+ { return text() }
-ws              = [ \s\n\r\t ]*
-name_separator  = ws colon ws
-value_separator = ws comma ws
-type            = type_bool / type_string / type_number / type_nullable / type_undefined / type_null / type_array / type_object / type_function / instance
-
-typed           = t:type { return { type: 'WILDCARD', typeOf: t }  }
-wildcard_symbol = '_'
-wildcard        = wildcard_symbol colon? t:type? { return { type: 'WILDCARD', typeOf: t } }
-
-number = float {
-	return {
-    type: 'LITERAL',
-    value: parseFloat(text())
-    }
+{
+const isString = (v) => typeof v === 'string';
+const makeNumber = (v) => parseFloat([].concat(...v).join(''));
 }
 
-boolean = b:(true / false) {
-	return {
-    	type: 'LITERAL',
+ROOT
+  = ws root:asOp ws { 
+    return {
+      __meta__: {
+        version: 1
+      },
+      root
+    }   
+  }
+
+
+
+asOp
+  = lhs:logicalAnd ws 'as' ws rhs:word { return { type: 'AS', value: lhs, name: rhs } }
+  / logicalAnd
+
+logicalAnd
+  = lhs:logicalOr ws '&' ws rhs:logicalAnd { return { type: 'AND', lhs, rhs } }
+  / logicalOr
+
+logicalOr
+  = lhs:arguments ws '|' ws rhs:logicalOr { return { type: 'OR', lhs, rhs } }
+  / arguments
+
+arguments
+  = values:(
+      head:factor
+      tail:(',' ws v:factor ws { return v; })* { return [head].concat(tail) }
+    )? { return values !== null ? { type: 'ARGUMENTS', values} : text() }
+
+factor
+  = '(' ws r:logicalAnd ws ')' { return r; }
+  / values
+
+
+
+
+values
+  = range
+  / rest
+  / number
+  / boolean
+  / string
+  / array
+  / wildcard
+  / object
+  / bind
+  / typed
+
+range
+  = ws start:range_item '..' end:range_item ws {
+      return { 
+        type: 'RANGE', 
+        start: isString(start) ? start : makeNumber(start),
+        end: isString(end) ? end : makeNumber(end) 
+      }
+    }
+
+rest
+  = ws '...' name:word? {
+      return {
+        type: 'REST',
+        name 
+      }
+    }
+
+number
+  = ws float ws {
+      return {
+        type: 'LITERAL',
+        value: parseFloat(text())
+      }
+    }
+
+boolean
+  = ws b:(true / false) ws {
+      return {
+    	  type: 'LITERAL',
         value: b === 'true' ? true : false
+      }
     }
-}
-
-typedVar = colon t:type { return t }
-
-bind = b:word t:typedVar? { return { type: 'BIND', value: b, typeOf: t } }
-
-array
-  = bracket_open
-    values:(
-      head:values
-      tail:(comma ws v:values ws { return v; })*
-      { return { type: 'LIST', values: [head].concat(tail) } }
-    )?
-    bracket_close colon? t:type?
-{ return values !== null ? Object.assign(values, {typeOf: t}) : { type: 'LIST', values: [], typeOf: t } ; }
-
 
 string "string"
-  = quote chars:char* quote { return {
-  type: 'LITERAL',
-  value: chars.join("")};
- }
+  = ws '"' chars:char* '"' ws {
+      return {
+        type: 'LITERAL',
+        value: chars.join("")};
+    }
+
+array
+  = ws '[' ws
+    values:(
+      head:values
+      tail:(',' ws v:values ws { return v; })*
+      { return { type: 'LIST', values: [head].concat(tail) } }
+    )?
+    ws ']' ':'? typeOf:type? ws
+    { return values !== null ? Object.assign(values, {typeOf}) : { type: 'LIST', values: [], typeOf } ; }
+
+wildcard
+  = '_' ':'? typeOf:type? {
+      return {
+        type: 'WILDCARD', 
+        typeOf
+      } 
+    }
+
+bind
+  = value:word typeOf:typedVar? {
+      return {
+        type: 'BIND',
+        value,
+        typeOf
+      }
+    }
+
+object
+  = ws '{' ws
+    members:(
+      head:member
+      tail:(ws ',' ws m:member { return m; })*
+      {
+      
+      	var result = [];
+
+        [head].concat(tail).forEach(function(element) {
+          if(element.rest) { 
+            result.push({ type: 'REST', name: element.name, key: element.name })
+          } else {
+            result.push(Object.assign(element.bind ? { type: 'BIND', value: element.value } : element.value, {key: element.name}));
+          }
+        });
+
+        return result;
+      }
+    )?
+    ws '}' ws
+    { return { type: 'OBJECT', values: members !== null ? members : [] }; }
+
+typed
+  = typeOf:type {
+    return {
+      type: 'WILDCARD',
+      typeOf
+    }
+  }
+
+
+
+
+
+
+member
+  = t:rest { return { name: t.name, value: null, rest: true } }
+  / name:word ws ':' ws value:values { return { name: name, value: value }; }
+  / name:word { return { name: name, value: name, bind: true } }
+
+range_item
+  = minus? digit / [a-z] / [A-Z]
+
+reserved
+  = 'as' [ \s\n\r\t ]+
+  / 'as' ','
+
+word "word"
+  = !reserved [a-z]+ {
+      return text()
+    }
+
+float
+  = minus? digit '.'? digit?
+
+digit
+  = [0-9]+
+
+minus
+  = ws '-'
+
+true
+  = 'true'
+
+false
+  = 'false'
+
+typedVar
+  = ':' t:type { return t }
+
+instance
+  = [A-Z][a-z]+ { return text() }
+
+type
+  = 'Boolean'
+  / 'String'
+  / 'Number'
+  / 'Nullable'
+  / 'Undefined'
+  / 'Null'
+  / 'Array'
+  / 'Object'
+  / 'Function'
+  / instance
 
 char
   = unescaped
@@ -104,63 +227,10 @@ escape
   = "\\"
 
 unescaped
-= [^\0-\x1F\x22\x5C]
+  = [^\0-\x1F\x22\x5C]
 
-DIGIT  = [0-9]
-HEXDIG = [0-9a-f]i
+HEXDIG
+  = [0-9a-f]i
 
-
-//------
-
-object
-  = curly_open
-    members:(
-      head:member
-      tail:(value_separator m:member { return m; })*
-      {
-      
-      	var result = [];
-
-        [head].concat(tail).forEach(function(element) {
-          if(element.rest) { 
-            result.push({ type: 'REST', name: element.name, key: element.name })
-          } else {
-            result.push(Object.assign(element.bind ? { type: 'BIND', value: element.value } : element.value, {key: element.name}));
-          }
-        });
-
-        return result;
-      }
-    )?
-    curly_close
-    { return { type: 'OBJECT', values: members !== null ? members : [] }; }
-
-member
-  = t:rest { return { name: t.name, value: null, rest: true } }
-  / name:word name_separator value:values { return { name: name, value: value }; }
-  / name:word { return { name: name, value: name, bind: true } }
-   
-
-asOp = left:andOp as right:bind { return { type: 'AS', value: left, name: right.value } }
-     / andOp
-     / arguments
-
-andOp = left:orOp and right:andOp { return { type: 'AND', lhs: left, rhs: right } }
-     / orOp
-     / arguments
-
-orOp = left:arguments or right:orOp { return { type: 'OR', lhs: left, rhs: right } }
-    / arguments
-
-
-values = range / rest / number / boolean / string / array / wildcard / object / bind / typed
-
-arguments
-  =  val:(
-      head:values
-      tail:(comma ws v:values ws { return v; })*
-      { return  [head].concat(tail) }
-    )?
-{  return val !== null ? { type: 'ARGUMENTS', values: val} : text() }
-
-root = asOp
+ws
+  = [ \s\n\r\t ]*
