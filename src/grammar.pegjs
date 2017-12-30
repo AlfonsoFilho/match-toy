@@ -180,10 +180,10 @@
         return text()
       }
 
-  float
+  float "number"
     = minus? digit '.'? digit?
 
-  digit
+  digit "digit"
     = [0-9]+
 
   minus
@@ -241,5 +241,5 @@
   HEXDIG
     = [0-9a-f]i
 
-  ws
+  ws "whitespace"
     = [ \s\n\r\t ]*
