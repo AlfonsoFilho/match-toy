@@ -51,7 +51,6 @@ const nodeReader: {[key: string]: any } = {
 
     const inputContainsRest = hasRest(node.values);
 
-    // if (!is(input, 'Object') || Object.keys(input).length !== node.values.length) {
     // tslint:disable-next-line:max-line-length
     if (!is(input, 'Object') || (inputContainsRest ? Object.keys(input).length === 0 : Object.keys(input).length !== node.values.length)) {
       return FAIL;
@@ -61,7 +60,7 @@ const nodeReader: {[key: string]: any } = {
       const restNode = getRest(node.values) || {} as AstNode;
       const expectedKeys = node.values.filter(({type}: AstNode) => type !== AstType.REST).map(({key}: AstNode) => key);
       const newObj: {[key: string]: any} = {};
-      const restObj: {[key: string]: any} = {};
+      let restObj: {[key: string]: any} = {};
 
       Object.keys(input).forEach((key) => {
         if (contains(key, expectedKeys)) {
@@ -71,7 +70,18 @@ const nodeReader: {[key: string]: any } = {
         }
       });
 
-      const result = Object.keys(input).map((inputKey: string) => {
+      if (restNode.values) {
+        const copy = restObj;
+        restObj = {};
+        Object.keys(copy).map((it) => {
+          const [ status, result ] = interpreter({root: restNode}, [copy[it]]);
+          if (status) {
+            restObj[it] = result[restNode.name][0];
+          }
+        });
+      }
+
+      const result2 = Object.keys(input).map((inputKey: string) => {
         const it = node.values.find(({key}: AstNode) => key === inputKey);
         if (it) {
           return interpreter({ root: it}, newObj[inputKey]);
@@ -80,8 +90,8 @@ const nodeReader: {[key: string]: any } = {
         }
       }).filter((it) => typeof it !== 'undefined');
 
-      if (result.every(([status, _]) => status === true)) {
-        const resultArgs = result.reduce((acc, it) => it ? ({ ...acc, ...it[1] }) : acc, {});
+      if (result2.every(([status, _]) => status === true)) {
+        const resultArgs = result2.reduce((acc, it) => it ? ({ ...acc, ...it[1] }) : acc, {});
         const boundRest = restNode.name ? { [restNode.name]: restObj } : {};
         return [ true, { ...resultArgs, ...boundRest} ];
       } else {
@@ -152,7 +162,19 @@ const nodeReader: {[key: string]: any } = {
   },
 
   [AstType.REST]: (input: any[], node: AstNode): MatchResult => {
-    return [ true, { [node.name]: input } ];
+    if (node.values) {
+      const filteredInput = input.map((it) => interpreter({root: node.values}, it))
+                    .filter(([status, _]) => status)
+                    .map(([_, value]) => value);
+
+      if (filteredInput.length > 0) {
+        return [ true, { [node.name]: filteredInput } ];
+      } else {
+        return [false, {}];
+      }
+    } else {
+      return [ true, { [node.name]: input } ];
+    }
   },
 
   [AstType.WILDCARD]: (input: any[], node: AstNode): MatchResult => {
