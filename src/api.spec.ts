@@ -7,6 +7,14 @@ describe('API', () => {
 
     it('should return predicate result', () => {
       const matchResult = match(1)
+        .case('1', () => 'one')
+        .end();
+
+      expect(matchResult).toBe('one');
+    });
+
+    it('should have alias with()', () => {
+      const matchResult = match(1)
         .with('1', () => 'one')
         .end();
 
@@ -15,8 +23,8 @@ describe('API', () => {
 
     it('should return result when passing multiple values', () => {
       const matchResult = match(1, 2)
-        .with('1', () => 'one')
-        .with('1, 2', () => 'one and two')
+        .case('1', () => 'one')
+        .case('1, 2', () => 'one and two')
         .end();
 
       expect(matchResult).toBe('one and two');
@@ -24,7 +32,7 @@ describe('API', () => {
 
     it('should return undefined when match fails', () => {
       const matchResult = match(2)
-        .with('1', () => 'one')
+        .case('1', () => 'one')
         .end();
 
       expect(matchResult).toBeUndefined();
@@ -34,8 +42,8 @@ describe('API', () => {
   describe('basic match function', () => {
     it('should return function', () => {
       const isOneOrTwo = match()
-        .with('1', () => 'one')
-        .with('2', () => 'two')
+        .case('1', () => 'one')
+        .case('2', () => 'two')
         .end();
 
       expect(typeof isOneOrTwo).toBe('function');
@@ -44,8 +52,8 @@ describe('API', () => {
 
     it('should return undefined if match fails', () => {
       const isOneOrTwo = match()
-        .with('1', () => 'one')
-        .with('2', () => 'two')
+        .case('1', () => 'one')
+        .case('2', () => 'two')
         .end();
 
       expect(isOneOrTwo(3)).toBeUndefined();
@@ -56,8 +64,8 @@ describe('API', () => {
   describe('guards', () => {
     it('simple guard', () => {
       const isOneOrTwo = match()
-        .with('1..10', () => 'is even').when((v) => v % 2 === 0)
-        .with('1..10', () => 'is odd')
+        .case('1..10', () => 'is even').when((v) => v % 2 === 0)
+        .case('1..10', () => 'is odd')
         .else(() => 'not a real number')
         .end();
 
@@ -68,8 +76,8 @@ describe('API', () => {
 
     it('simple guard with many values', () => {
       const isOneOrTwo = match()
-        .with('1..10, x', () => 'is short').when((_, y) => y.length <= 5)
-        .with('1..10, x', () => 'is big')
+        .case('1..10, x', () => 'is short').when((_, y) => y.length <= 5)
+        .case('1..10, x', () => 'is big')
         .else(() => 'don\'t match')
         .end();
 
@@ -81,10 +89,10 @@ describe('API', () => {
 
       expect(() => {
         const isOneOrTwo = match()
-        .with('1..10, x', () => 'is short')
+        .case('1..10, x', () => 'is short')
           .when((_, y) => y.length <= 5)
           .when((_, y) => y.length <= 1)
-        .with('1..10, x', () => 'is big')
+        .case('1..10, x', () => 'is big')
         .else(() => 'don\'t match')
         .end();
       }).toThrowError(ErrorMessages.ONE_GUARD_PER_PATTERN);
@@ -94,8 +102,8 @@ describe('API', () => {
   describe('do', () => {
     it('should allow add callback using do function', () => {
       const isOneOrTwo = match()
-        .with('1').do(() => 'is one')
-        .with('2').do(() => 'is two')
+        .case('1').do(() => 'is one')
+        .case('2').do(() => 'is two')
         .end();
 
       expect(isOneOrTwo(1)).toBe('is one');
@@ -105,8 +113,8 @@ describe('API', () => {
     it('should throw an error if predicate is not defined', () => {
       expect(() => {
         const isOneOrTwo = match()
-          .with('1')
-          .with('2').do(() => 'is two')
+          .case('1')
+          .case('2').do(() => 'is two')
           .end();
 
         isOneOrTwo(1);
@@ -117,10 +125,10 @@ describe('API', () => {
 
   describe('Nesting matching', () => {
     const nestedFn = match()
-      .with('_:String, x', ({x}) =>
+      .case('_:String, x', ({x}) =>
         match(x)
-          .with('y', ({ y }) => `Value ${y} is even`).when((y) => y % 2 === 0)
-          .with('y', ({ y }) => `Value ${y} is odd`)
+          .case('y', ({ y }) => `Value ${y} is even`).when((y) => y % 2 === 0)
+          .case('y', ({ y }) => `Value ${y} is odd`)
           .end())
       .end();
     expect(nestedFn('test', 2)).toBe('Value 2 is even');
@@ -129,8 +137,8 @@ describe('API', () => {
   describe('alternative syntax', () => {
     it('should be able to define pattern, callback and guard within a with statement', () => {
       const isOneOrTwo = match()
-        .with('x', ({x}) => `${x} is even`, (x) => x % 2 === 0)
-        .with('x', ({x}) => `${x} is odd`)
+        .case('x', ({x}) => `${x} is even`, (x) => x % 2 === 0)
+        .case('x', ({x}) => `${x} is odd`)
         .end();
 
       expect(isOneOrTwo(1)).toBe('1 is odd');
@@ -139,8 +147,8 @@ describe('API', () => {
 
     it('should being able to define patten and callback in a single with and a when ', () => {
       const isOneOrTwo = match()
-        .with('x', ({x}) => `${x} is even`).when((x) => x % 2 === 0)
-        .with('x', ({x}) => `${x} is odd`)
+        .case('x', ({x}) => `${x} is even`).when((x) => x % 2 === 0)
+        .case('x', ({x}) => `${x} is odd`)
         .end();
 
       expect(isOneOrTwo(1)).toBe('1 is odd');
@@ -149,8 +157,8 @@ describe('API', () => {
 
     it('should being able to define patten, callback and guard separately', () => {
       const isOneOrTwo = match()
-        .with('x').do(({x}) => `${x} is even`).when((x) => x % 2 === 0)
-        .with('x', ({x}) => `${x} is odd`)
+        .case('x').do(({x}) => `${x} is even`).when((x) => x % 2 === 0)
+        .case('x', ({x}) => `${x} is odd`)
         .end();
 
       expect(isOneOrTwo(1)).toBe('1 is odd');
@@ -159,8 +167,8 @@ describe('API', () => {
 
     it('should being able to define patten, callback and guard separately on different order', () => {
       const isOneOrTwo = match()
-        .with('x').when((x) => x % 2 === 0).do(({x}) => `${x} is even`)
-        .with('x', ({x}) => `${x} is odd`)
+        .case('x').when((x) => x % 2 === 0).do(({x}) => `${x} is even`)
+        .case('x', ({x}) => `${x} is odd`)
         .end();
 
       expect(isOneOrTwo(1)).toBe('1 is odd');
@@ -171,8 +179,8 @@ describe('API', () => {
   describe('else', () => {
     it('should use else when nothing matches', () => {
       const isOneOrTwo = match()
-        .with('1', () => 'is one')
-        .with('2', () => 'is two')
+        .case('1', () => 'is one')
+        .case('2', () => 'is two')
         .else(() => 'don\'t match')
         .end();
 
@@ -183,7 +191,7 @@ describe('API', () => {
   describe('catch', () => {
     it('should use else when nothing matches', () => {
       const isOneOrTwo = match()
-        .with('true', () => JSON.parse('wrong json syntax'))
+        .case('true', () => JSON.parse('wrong json syntax'))
         .end();
 
       expect(isOneOrTwo(true)).toEqual(expect.stringMatching(/^Match error/));
@@ -192,7 +200,7 @@ describe('API', () => {
     it('should use else when nothing matches', () => {
       const cb = jest.fn();
       const isOneOrTwo = match()
-        .with('true', () => JSON.parse('wrong json syntax'))
+        .case('true', () => JSON.parse('wrong json syntax'))
         .catch((e) => {
           cb();
           return 'Custom message';

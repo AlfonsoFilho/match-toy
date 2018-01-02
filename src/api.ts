@@ -52,9 +52,13 @@ export class Matcher {
     }
   }
 
-  public with(pattern: string, predicate?: AnyFn, guard?: BoolFn) {
+  public case(pattern: string, predicate?: AnyFn, guard?: BoolFn) {
     this.matchList.push({ pattern: compile(pattern), predicate, guard });
     return this;
+  }
+
+  public with(pattern: string, predicate?: AnyFn, guard?: BoolFn) {
+    return this.case(pattern, predicate, guard);
   }
 
   public do(predicate: AnyFn): Matcher {
