@@ -80,7 +80,7 @@ What if we do the same with Match-ish:
 import { match } from 'match-ish'
 
 const getUserResponse = match()
-  .with('{ status: 200, user: { name:String, ...address } }', ({name, address}) => 
+  .case('{ status: 200, user: { name:String, ...address } }', ({name, address}) => 
     `User name is ${name} and lives on ${formatAddress(address)}`)
   .else(() => 'No user found')
   .catch((e) => console.log('Error on getUserResponse', e))
@@ -128,7 +128,7 @@ For specific version append the desired version (on the format `@x.x.x`) before 
 This file is a bundle in the [UMD](https://github.com/umdjs/umd) format. In browser's environments, the module name is in camelcase and available on `window` scope.
 ```javascript
 var myFunc = matchIsh.match()
-                      .with('1', () => 'one')
+                      .case('1', () => 'one')
                       .end()
 ```
 
@@ -141,7 +141,7 @@ import { match } from 'match-ish';
 
 // Create a new pattern matching function
 const convertOneToString = match()
-  .with('1', () => 'one')
+  .case('1', () => 'one')
   .end();
 
 convertOneToString(1); // return 'one'
@@ -150,7 +150,7 @@ convertOneToString(2); // return undefined
 // Create another one, but now since we are passing an
 // argument the matching runs immediately.
 const one = match(1)
-  .with('1', () => 'one')
+  .case('1', () => 'one')
   .end();
 
 one === 'one'; // true
@@ -158,16 +158,16 @@ one === 'one'; // true
 Let's dig around the library features and see what else we can do.
 
 #### Declaring patterns
-The `with()` functions are used to define patterns and callbacks:
+The `case()` functions are used to define patterns and callbacks:
 ```javascript
 const myFunc = match()
-  .with('1', () => 'one')
+  .case('1', () => 'one')
   
   // every bound variable is passed into an object 
-  .with('x, 1', (boundVars) => 'X is ' + boundVars.x) 
+  .case('x, 1', (boundVars) => 'X is ' + boundVars.x) 
   
   // using es6 destructuring, things looks much better
-  .with('2, y', ({ y }) => `Y is ${y}`) 
+  .case('2, y', ({ y }) => `Y is ${y}`) 
   .end()
 
 myFunc(2, 1); // === 'X is 2'
@@ -184,8 +184,8 @@ You can define patterns as much as you want. As you can notice in the example ab
 Guards are a way to declare a condition. It is defined with `when()`:
 ```javascript
 const myFunc = match()
-  .with('x', ({x}) => `${x} is even`).when((x) => x % 2 === 0)
-  .with('x', ({x}) => `${x} is odd`)
+  .case('x', ({x}) => `${x} is even`).when((x) => x % 2 === 0)
+  .case('x', ({x}) => `${x} is odd`)
   .end()
 
 myFunc(2); // === '2 is even'
@@ -197,15 +197,15 @@ In this case, the pattern is exactly the same. But since there is guard defining
 Only one guard per pattern is allowed:
 ```javascript
 const myFunc = match()
-  .with('x, y', () => 'are equal').when((x, y) => x === y)
-  .with('x, y', () => 'x > y').when((x, y) => x > y)
-  .with('x, y', () => 'x < y').when((x, y) => x < y)
+  .case('x, y', () => 'are equal').when((x, y) => x === y)
+  .case('x, y', () => 'x > y').when((x, y) => x > y)
+  .case('x, y', () => 'x < y').when((x, y) => x < y)
 
-  .with('x, y', () => 'wrong')
+  .case('x, y', () => 'wrong')
     .when((x, y) => !!x)
     .when((x, y) => !!y)  // more than one when() throws an error
 
-  .with('x, y', (() => `${x}, ${y}`))
+  .case('x, y', (() => `${x}, ${y}`))
   .end()
 
 ```
@@ -215,20 +215,20 @@ Alternatively, you can define the callback using the `do()`:
 ```javascript
 const myFunc = match()
   // Common (and recommended) syntax
-  // with(<pattern>, <callback>).when(condition)
-  .with('x, y', () => 'x < y').when((x, y) => x < y)
+  // case(<pattern>, <callback>).when(condition)
+  .case('x, y', () => 'x < y').when((x, y) => x < y)
   
   // `do` syntax
-  // with(<pattern>).do(<callback>).when(condition)
-  .with('x, y').do(() => 'x > y').when((x, y) => x > y)
+  // case(<pattern>).do(<callback>).when(condition)
+  .case('x, y').do(() => 'x > y').when((x, y) => x > y)
   
   // `when` and `do` inverted
-  // with(<pattern>).when(condition).do(<callback>)
-  .with('x, y').when((x, y) => x > y).do(() => 'x > y')
+  // case(<pattern>).when(condition).do(<callback>)
+  .case('x, y').when((x, y) => x > y).do(() => 'x > y')
   
-  // Or even you can use only `with`
-  // with(<pattern>, <callback>, <condition>)
-  .with('x, y', () => 'are equal', (x, y) => x === y)
+  // Or even you can use only `case`
+  // case(<pattern>, <callback>, <condition>)
+  .case('x, y', () => 'are equal', (x, y) => x === y)
   .end()
 
 ```
@@ -237,7 +237,7 @@ const myFunc = match()
 If there is no match, the default return value is `undefined`:
 ```javascript
 const myFunc = match()
-  .with('1', () => 'one')
+  .case('1', () => 'one')
   .end()
 
 myFunc(3) // === undefined
@@ -246,8 +246,8 @@ myFunc(3) // === undefined
 But you can use an `else()` in order to handle no matching cases.
 ```javascript
 const myFunc = match()
-  .with('1', () => 'one')
-  .with('2', () => 'two')
+  .case('1', () => 'one')
+  .case('2', () => 'two')
   .else(() => 'I give up gracefully')
   .end()
 
@@ -260,7 +260,7 @@ myFunc(3) // === 'I give up'
 Sometimes our callbacks may throw an error for some reason. Because of that, they are wrapped into a try..catch.
 ```javascript
 const myFunc = match()
-  .with('true', () => JSON.parse('wrong json syntax'))
+  .case('true', () => JSON.parse('wrong json syntax'))
   .end();
 
 myFunc(true) // === Match error: SyntaxError: JSON.parse...
@@ -268,7 +268,7 @@ myFunc(true) // === Match error: SyntaxError: JSON.parse...
 With `catch()` you can define a function to handle this cases for a better response or some kind of recovery strategy.
 ```javascript
 const myFunc = match()
-  .with('true', () => JSON.parse('wrong json syntax'))
+  .case('true', () => JSON.parse('wrong json syntax'))
   .catch((e) => 'Oh! No! Not again.')
   .end();
 
@@ -279,10 +279,10 @@ myFunc(true) // === 'Oh! No! Not again.'
 You can achieve nesting matching by simply creating a new pattern match inside the callback:
 ```javascript
 const myFunc = match()
-  .with('0', () => 'is zero')
-  .with('_, x', ({x}) => match(x)
-    .with('y', () => 'Y is even').when((y) => y % 2 === 0)
-    .with('y', () => 'Y is odd')
+  .case('0', () => 'is zero')
+  .case('_, x', ({x}) => match(x)
+    .case('y', () => 'Y is even').when((y) => y % 2 === 0)
+    .case('y', () => 'Y is odd')
     .end())
   .end();
 
@@ -290,20 +290,20 @@ myFunc(2, 2) // Y is even
 ```
 
 ### DSL
-So far, we covered how to use the library functions. Now, let talk about what makes Match-ish shines. As discussed above, the first argument of the `with()` function is not really a string. It is [Domain Specific Language](https://en.wikipedia.org/wiki/Domain-specific_language), designed to make patterns definitions easier.  [Other libraries](#other-nice-projects-and-initiatives) have different approaches like object schemas or extending the language with macros _(macros are great BTW)_. But for the sake of expressiveness and simplicity Match-ish use a really simple and straightforward declarative language. Right below, you'll find out everything you need to start using it.
+So far, we covered how to use the library functions. Now, let talk about what makes Match-ish shines. As discussed above, the first argument of the `case()` function is not really a string. It is [Domain Specific Language](https://en.wikipedia.org/wiki/Domain-specific_language), designed to make patterns definitions easier.  [Other libraries](#other-nice-projects-and-initiatives) have different approaches like object schemas or extending the language with macros _(macros are great BTW)_. But for the sake of expressiveness and simplicity Match-ish use a really simple and straightforward declarative language. Right below, you'll find out everything you need to start using it.
 
 #### Sequence of values
 All patterns expect a defined order and length. If a given input doesn't match either, the evaluation fails and go to the next pattern.
 ```javascript
-.with('1')
+.case('1')
 // Given 1 matches
 // Given 1, 2 not matches
 
-.with('1, 2')
+.case('1, 2')
 // Given 1, 2 matches
 // Given 1 not matches
 
-.with('2, 1')
+.case('2, 1')
 // Given 2, 1 matches
 // Given 1, 2 not matches
 
@@ -313,54 +313,54 @@ All patterns expect a defined order and length. If a given input doesn't match e
 The literal pattern is used when an equal value match is expected.
 ```javascript
                   // Supported types
-.with('1')        // Numbers
-.with('"string"') // String
-.with('true')     // Boolean
-.with('{ a: 1 }') // Objects
-.with('[ 1, 2 ]') // Arrays
-.with('{}')       // empty Objects
-.with('[]')       // empty Arrays
+.case('1')        // Numbers
+.case('"string"') // String
+.case('true')     // Boolean
+.case('{ a: 1 }') // Objects
+.case('[ 1, 2 ]') // Arrays
+.case('{}')       // empty Objects
+.case('[]')       // empty Arrays
 
-.with('1, 2, 3')  // sequence of values  
-.with('true, "text", { a: 1 }, [true, true]') // sequence of mixed values
+.case('1, 2, 3')  // sequence of values  
+.case('true, "text", { a: 1 }, [true, true]') // sequence of mixed values
 ```
 #### Bind
 The bind pattern assigns the matched value to a variable.
 ```javascript
 // Bind any value to variable 'x'
-.with('x')
+.case('x')
 
 // Bind the second value to variable 'x'
-.with('1, x')
+.case('1, x')
 
 // Bind any values from the sequence respectively 
 // to the variables 'a', 'b' and 'c'
-.with('a, b, c')
+.case('a, b, c')
 
 // Bind the second item of an array to the variable 'second'
-.with('[1, second]')
+.case('[1, second]')
 
 // Bind any value of the property b from an object
 // to the variable 'myvar'
-.with('{ a: 1, b: myvar')
+.case('{ a: 1, b: myvar')
 ```
 #### Wildcard
 This pattern will match anything, despite the value, then it is ignored. This is very useful for ignore unrelevant values inside a sequence or list. Another case is use wildcards as a final clause if none of the previous patterns matches.
 ```javascript
-.with('_')      
-.with('_, 2')   
-.with('[2, _]') 
-.with('{ a: 1, b: _ }') 
+.case('_')      
+.case('_, 2')   
+.case('[2, _]') 
+.case('{ a: 1, b: _ }') 
 
 // Example of wildcard as final match
-.with('0', () => 'zero')
-.with('1', () => 'one')
-.with('_', () => 'not binary')
+.case('0', () => 'zero')
+.case('1', () => 'one')
+.case('_', () => 'not binary')
 
 // But remember, order is important
-.with('_', () => 'not binary') // every value would match
-.with('0', () => 'zero')       // unreachable
-.with('1', () => 'one')        // unreachable
+.case('_', () => 'not binary') // every value would match
+.case('0', () => 'zero')       // unreachable
+.case('1', () => 'one')        // unreachable
 
 
 ```
@@ -368,35 +368,35 @@ This pattern will match anything, despite the value, then it is ignored. This is
 It is possible to use types in order to qualify the values.
 ```javascript
 // Bind only string type value to the variable 'x'
-.with('x:String')        
+.case('x:String')        
 
 // Match any value that is a Number type
-.with('Number')
+.case('Number')
 
 // Bind the value of the property 'b' to
 // the variable 'myvar', if it is a string
-.with('{ a: Number, b: myvar:String }')
+.case('{ a: Number, b: myvar:String }')
 
 // Match an array where every item is a string
-.with('[...]:String') 
+.case('[...]:String') 
 
 ```
 
 Supported types: 
 ```javascript
-.with('String')    // "what's the meaning of life"
-.with('Number')    // 42
-.with('Boolean')   // true
-.with('Undefined') // undefined
-.with('Null')      // null
-.with('Array')     // []
-.with('Object')    // {}
-.with('Function')  // () => {/*code*/}
-.with('RegExp')    // /a-z/
-.with('Date')    // new Date()
+.case('String')    // "what's the meaning of life"
+.case('Number')    // 42
+.case('Boolean')   // true
+.case('Undefined') // undefined
+.case('Null')      // null
+.case('Array')     // []
+.case('Object')    // {}
+.case('Function')  // () => {/*code*/}
+.case('RegExp')    // /a-z/
+.case('Date')    // new Date()
 
 // Nullable is a special type. 
-.with('Nullable')  // {}, [], '', 0, undefined, null
+.case('Nullable')  // {}, [], '', 0, undefined, null
 ```
 
 In can use 'custom types' by checking if the input is an instance of an Class/Function/Object:
@@ -404,7 +404,7 @@ In can use 'custom types' by checking if the input is an instance of an Class/Fu
 
 const red = new Color();
 const result = match(red)
-  .with('Color', () => 'it\'s a color') // true
+  .case('Color', () => 'it\'s a color') // true
   .else(() => 'it\'s not a color')
   .end()
 ```
@@ -412,11 +412,11 @@ const result = match(red)
 #### Range
 This pattern can match a range of values.
 ```javascript
-.with('1..5')        // A range of numbers from 1 to 5
-.with('1..5, 10')    // Numbers
-.with('a..z')        // A range of chars from a to z
-.with('A..Z')        // A range of chars from A to Z
-.with('A..z')        // A range of chars from A to z, so something like (A, B, C ... Z, a, b, c ... z)
+.case('1..5')        // A range of numbers from 1 to 5
+.case('1..5, 10')    // Numbers
+.case('a..z')        // A range of chars from a to z
+.case('A..Z')        // A range of chars from A to Z
+.case('A..z')        // A range of chars from A to z, so something like (A, B, C ... Z, a, b, c ... z)
 ```
 
 #### Rest
@@ -425,22 +425,22 @@ The rest pattern, is very similar to the rest operator of Javascript.
 // Match an object with the property 'a' equal to 1 then
 // capture the rest of the properties and assign to the variable 'others'.
 // e.g.: given { a: 1, b: 2: c: 3 } then others === { b: 2, c: 3 }
-.with('{ a: 1, ...others}')     
+.case('{ a: 1, ...others}')     
 
 // Split an array by assigning the first item to the variable 'head'
 // and the rest of the list to the variable 'tail'
-.with('[ head, ...tail]')       
+.case('[ head, ...tail]')       
 
 // Again, split an array binding the first two values
 // but now, the rest of the list is ignored
-.with('[ first, second, ...]')
-.with('[ a, b, c, ...dtoy, z]') // Numbers
+.case('[ first, second, ...]')
+.case('[ a, b, c, ...dtoy, z]') // Numbers
 
 // Match an array with one or more items
-.with('[ ... ]')
+.case('[ ... ]')
 
 // Match an object with one or more items
-.with('{ ... }')
+.case('{ ... }')
 ```
 
 ### Mapping
@@ -454,7 +454,7 @@ const marvelCharacters = [
  ];
 
 const getHeroes = match()
-  .with('[...characters({ name: hero, type: "hero", ... })]')
+  .case('[...characters({ name: hero, type: "hero", ... })]')
     .do(({characters}) => characters)
   .end();
 
@@ -471,14 +471,14 @@ getHeroes(marvelCharacters);
 #### RegExp
 You can define regular expressions.
 ```javascript
-.with('/^(http|https)/')
+.case('/^(http|https)/')
 ```
 
 #### Logical Or
 With the operator `|` you can combine multiple patterns in order to match one of them.
 ```javascript
-.with('2 | 4') // will match either 2 or 4
-.with('1, _ | 2, _ ')
+.case('2 | 4') // will match either 2 or 4
+.case('1, _ | 2, _ ')
 // Given 1, 2 match
 // Given 2, 8 match
 // Given 3, 1 not match
@@ -488,20 +488,22 @@ With the operator `|` you can combine multiple patterns in order to match one of
 With the operator `&` you can combine multiple patterns in order to match all of them.
 ```javascript
 // should match the input 2, 4 and bind 2 to the variabel `x`
-.with('2, x & _, 4')
+.case('2, x & _, 4')
 ```
 #### As
 Capture all the bound values then assign them to another variable.
 ```javascript
 // Given { 1, 2, 3 } then { x: 1, y: 2, z: 3, all: {x: 1, y: 2, z: 3} }
-.with('x, y, z as all')        // Numbers
+.case('x, y, z as all')        // Numbers
 ```
 
 ### API
 #### `match(...value?: any): any | function`
 Start pattern match definition. If one or more arguments are passed `match()` will return the result of the matching. Otherwise, the return will be a function.
-#### `with(pattern: string, callback?: function, guard?: function)`
+#### `case(pattern: string, callback?: function, guard?: function)`
 Define a patten. Optionaly can set the callback and a guard.
+#### `with(pattern: string, callback?: function, guard?: function)`
+Alias for `case()`.
 #### `when((...input?: any) => boolean)`
 Define a guard. Receive a function as an argument. This function will receive the sequence of input, then should return a boolean value. For example, if the input is `match(1, 2, 3)`, a valid guard must be `(a, b, c) => a > b > c`.
 #### `do(callback: function)`
