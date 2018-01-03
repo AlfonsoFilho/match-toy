@@ -555,6 +555,9 @@ $ npm run lint
 
 ## Other nice projects and initiatives
 - [ECMAScript Pattern Matching Syntax - Stage 0 Proposal](https://github.com/tc39/proposal-pattern-matching)
+- https://github.com/eborden/JS-Pattern-Matching
+- https://gist.github.com/bterlson/da8f02b95b484cd4f8d9
+- [Pattern Matching with flow-runtime](https://codemix.github.io/flow-runtime/#/docs/pattern-matching)
 - [Pat-Mat](https://github.com/HerringtonDarkholme/Pat-Mat) - Coffeescript flavored pattern-matching lib.
 - [sparkler](https://github.com/natefaubion/sparkler) - library that implements pattern matching with a custom language level syntax using macros with [sweet.js](https://github.com/sweet-js/sweet-core).
 - [funcy](https://github.com/bramstein/funcy)
