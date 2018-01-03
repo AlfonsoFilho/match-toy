@@ -4,7 +4,7 @@
   }
 
   ROOT
-    = ws root:asOp ws { 
+    = _ root:asOp _ { 
       return {
         __meta__: {
           version: 1
@@ -13,28 +13,26 @@
       }   
     }
 
-
-
   asOp
-    = lhs:logicalAnd ws 'as' ws rhs:word { return { type: 'AS', value: lhs, name: rhs } }
+    = lhs:logicalAnd _ 'as' __ rhs:word { return { type: 'AS', value: lhs, name: rhs } }
     / logicalAnd
 
   logicalAnd
-    = lhs:logicalOr ws '&' ws rhs:logicalAnd { return { type: 'AND', lhs, rhs } }
+    = lhs:logicalOr _ '&' _ rhs:logicalAnd { return { type: 'AND', lhs, rhs } }
     / logicalOr
 
   logicalOr
-    = lhs:arguments ws '|' ws rhs:logicalOr { return { type: 'OR', lhs, rhs } }
+    = lhs:arguments _ '|' _ rhs:logicalOr { return { type: 'OR', lhs, rhs } }
     / arguments
 
   arguments
-    = values:(
+    = _ values:(
         head:factor
-        tail:(',' ws v:factor ws { return v; })* { return [head].concat(tail) }
-      )? { return values !== null ? { type: 'ARGUMENTS', values} : text() }
+        tail:(',' _ v:factor _ { return v; })* { return [head].concat(tail) }
+      )? _ { return values !== null ? { type: 'ARGUMENTS', values} : text() }
 
   factor
-    = '(' ws r:logicalAnd ws ')' { return r; }
+    = '(' _ r:logicalAnd _ ')' { return r; }
     / values
 
 
@@ -54,7 +52,7 @@
     / regex
 
   range
-    = ws start:range_item '..' end:range_item ws {
+    = _ start:range_item '..' end:range_item _ {
         return { 
           type: 'RANGE', 
           start: isString(start) ? start : makeNumber(start),
@@ -63,14 +61,14 @@
       }
 
   rest
-    = ws '...' name:word? "(" values:values ")" {
+    = _ '...' name:word? "(" values:values ")" {
       return {
           type: 'REST',
           name,
           values
       }
     }
-    / ws '...' name:word? {
+    / _ '...' name:word? {
         return {
           type: 'REST',
           name 
@@ -78,7 +76,7 @@
       }
 
   number
-    = ws float ws {
+    = _ float _ {
         return {
           type: 'LITERAL',
           value: parseFloat(text())
@@ -86,7 +84,7 @@
       }
 
   boolean
-    = ws b:(true / false) ws {
+    = _ b:(true / false) _ {
         return {
             type: 'LITERAL',
           value: b === 'true' ? true : false
@@ -94,20 +92,20 @@
       }
 
   string "string"
-    = ws '"' chars:char* '"' ws {
+    = _ '"' chars:char* '"' _ {
         return {
           type: 'LITERAL',
           value: chars.join("")};
       }
 
   array
-    = ws '[' ws
+    = _ '[' _
       values:(
         head:values
-        tail:(',' ws v:values ws { return v; })*
+        tail:(',' _ v:values _ { return v; })*
         { return { type: 'LIST', values: [head].concat(tail) } }
       )?
-      ws ']' ':'? typeOf:type? ws
+      _ ']' ':'? typeOf:type? _
       { return values !== null ? Object.assign(values, {typeOf}) : { type: 'LIST', values: [], typeOf } ; }
 
   wildcard
@@ -128,10 +126,10 @@
       }
 
   object
-    = ws '{' ws
+    = _ '{' _
       members:(
         head:member
-        tail:(ws ',' ws m:member { return m; })*
+        tail:(_ ',' _ m:member { return m; })*
         {
 
           var result = [];
@@ -147,7 +145,7 @@
           return result;
         }
       )?
-      ws '}' ws
+      _ '}' _
       { return { type: 'OBJECT', values: members !== null ? members : [] }; }
 
   typed
@@ -159,7 +157,7 @@
     }
   
   regex "regular expression"
-    = ws '/' r:[a-zA-Z0-9&_\-^{}()\[\],.*\\+?$!:=|]* '/' ws {
+    = _ '/' r:[a-zA-Z0-9&_\-^{}()\[\],.*\\+?$!:=|]* '/' _ {
     	return {
           type: 'REGEXP',
           value: new RegExp(r.join(''))
@@ -170,7 +168,7 @@
 
   member
     = t:rest { return { name: t.name, values: t.values, rest: true } }
-    / name:word ws ':' ws value:values { return { name: name, value: value }; }
+    / name:word _ ':' _ value:values { return { name: name, value: value }; }
     / name:word { return { name: name, value: name, bind: true } }
 
   range_item
@@ -193,7 +191,7 @@
     = [0-9]+
 
   minus
-    = ws '-'
+    = _ '-'
 
   true
     = 'true'
@@ -248,5 +246,12 @@
   HEXDIG
     = [0-9a-f]i
 
-  ws "whitespace"
-    = [ \s\n\r\t ]*
+  COMMA
+    = ','
+  // optional whitespace
+  _ "whitespace"
+    = [ \t\r\n]*
+
+  // mandatory whitespace
+  __ "whitespace"
+    = [ \t\r\n]+
