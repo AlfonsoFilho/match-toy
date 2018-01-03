@@ -70,6 +70,10 @@
     "testMatch": [
       "**/*.spec.(ts|tsx|js)"
     ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/examples/"
+    ],
     "collectCoverageFrom": [
       "**/*.ts",
       "!**/*.gen.ts",
