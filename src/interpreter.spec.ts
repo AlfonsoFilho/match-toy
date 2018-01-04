@@ -463,7 +463,7 @@ describe('Interpreter', () => {
     });
   });
 
-  describe('Mapping pattern', () => {
+  describe.skip('Mapping pattern', () => {
 
     it('should filter and desconstruct an array', () => {
       pattern = compile('[...characters({ name: hero, type: "hero", ... })]');
@@ -730,13 +730,18 @@ describe('Interpreter', () => {
 
   describe('As pattern', () => {
     describe('should bind all input values ', () => {
-      beforeEach(() => {
+
+      it('should match', () => {
         // with('x, y as z', ({x, y, z}) => "x = 1, y =2 z= {x:1, y:2}")
-        pattern = compile('x, y as z');
+        pattern = compile('z@(x, y)');
+        expect(interpreter(pattern, [1, 2])).toEqual([true, { x: 1, y: 2, z: [1, 2] }]);
       });
 
       it('should match', () => {
-        expect(interpreter(pattern, [1, 2])).toEqual([true, { x: 1, y: 2, z: [1, 2] }]);
+        // with('x, y as z', ({x, y, z}) => "x = 1, y =2 z= {x:1, y:2}")
+        pattern = compile('z@(x, y), 2');
+        expect(interpreter(pattern, [1, 2, 2])).toEqual([true, { x: 1, y: 2, z: [1, 2] }]);
+        // expect(interpreter(pattern, [1, 2, 3])).toEqual(FAIL);
       });
     });
   });

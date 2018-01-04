@@ -1,10 +1,20 @@
-  {
-  const isString = (v) => typeof v === 'string';
-  const makeNumber = (v) => parseFloat([].concat(...v).join(''));
-  }
+{
+    const isString = (v) => typeof v === 'string';
+    const makeNumber = (v) => parseFloat([].concat(...v).join(''));
+    const boundVars = [];
+    const addVariable = (name) => {
+    console.log(name, boundVars, boundVars.indexOf(name))
+      if (boundVars.indexOf(name) === -1) {
+        boundVars.push(name);
+        return true;
+      } else {
+        return false;
+      }
+    }
+}
 
   ROOT
-    = _ root:asOp _ { 
+    = _ root:logicalAnd _ { 
       return {
         __meta__: {
           version: 1
@@ -13,9 +23,14 @@
       }   
     }
 
-  asOp
-    = lhs:logicalAnd _ 'as' __ rhs:word { return { type: 'AS', value: lhs, name: rhs } }
-    / logicalAnd
+  asPattern
+    = name:word '@' value:factor {
+    	return { 
+        	...value,
+        	name
+        }
+    }
+    / values
 
   logicalAnd
     = lhs:logicalOr _ '&' _ rhs:logicalAnd { return { type: 'AND', lhs, rhs } }
@@ -26,14 +41,14 @@
     / arguments
 
   arguments
-    = _ values:(
+    = _ value:(
         head:factor
         tail:(',' _ v:factor _ { return v; })* { return [head].concat(tail) }
-      )? _ { return values !== null ? { type: 'ARGUMENTS', values} : text() }
+      )? _ { return value !== null ? { type: 'ARGUMENTS', value} : text() }
 
   factor
     = '(' _ r:logicalAnd _ ')' { return r; }
-    / values
+    / asPattern
 
 
 
@@ -61,11 +76,11 @@
       }
 
   rest
-    = _ '...' name:word? "(" values:values ")" {
+    = _ '...' name:word? "(" value:logicalAnd ")" {
       return {
           type: 'REST',
           name,
-          values
+          value
       }
     }
     / _ '...' name:word? {
@@ -100,13 +115,13 @@
 
   array
     = _ '[' _
-      values:(
+      value:(
         head:values
         tail:(',' _ v:values _ { return v; })*
-        { return { type: 'LIST', values: [head].concat(tail) } }
+        { return { type: 'LIST', value: [head].concat(tail) } }
       )?
       _ ']' ':'? typeOf:type? _
-      { return values !== null ? Object.assign(values, {typeOf}) : { type: 'LIST', values: [], typeOf } ; }
+      { return value !== null ? Object.assign(value, {typeOf}) : { type: 'LIST', value: [], typeOf } ; }
 
   wildcard
     = '_' ':'? typeOf:type? {
@@ -118,11 +133,12 @@
 
   bind
     = value:word typeOf:typedVar? {
+    	  console.log('bind')
         return {
           type: 'BIND',
           value,
           typeOf
-        }
+          }
       }
 
   object
@@ -136,7 +152,7 @@
 
           [head].concat(tail).forEach(function(element) {
             if(element.rest) { 
-              result.push({ type: 'REST', name: element.name, key: element.name, values: element.values })
+              result.push({ type: 'REST', name: element.name, key: element.name, value: element.value })
             } else {
               result.push(Object.assign(element.bind ? { type: 'BIND', value: element.value } : element.value, {key: element.name}));
             }
@@ -146,7 +162,7 @@
         }
       )?
       _ '}' _
-      { return { type: 'OBJECT', values: members !== null ? members : [] }; }
+      { return { type: 'OBJECT', value: members !== null ? members : [] }; }
 
   typed
     = typeOf:type {
@@ -167,7 +183,7 @@
 
 
   member
-    = t:rest { return { name: t.name, values: t.values, rest: true } }
+    = t:rest { return { name: t.name, value: t.value, rest: true } }
     / name:word _ ':' _ value:values { return { name: name, value: value }; }
     / name:word { return { name: name, value: name, bind: true } }
 
@@ -175,9 +191,7 @@
     = minus? digit / [a-z] / [A-Z]
 
   reserved
-    = 'as' [ \s\n\r\t ]+
-    / 'as' ','
-    / type
+    = type
 
   word "word"
     = !reserved [a-z]i+ {
