@@ -105,9 +105,16 @@
           value: b === 'true' ? true : false
         }
       }
+	single_quote = '\''
+    doube_quote = '"'
 
   string "string"
-    = _ '"' chars:char* '"' _ {
+    = _ '"' chars:DoubleStringCharacter* '"' _ {
+        return {
+          type: 'LITERAL',
+          value: chars.join("")};
+      }
+    / _ "'" chars:SingleStringCharacter* "'" _ {
         return {
           type: 'LITERAL',
           value: chars.join("")};
@@ -133,7 +140,6 @@
 
   bind
     = value:word typeOf:typedVar? {
-    	  console.log('bind')
         return {
           type: 'BIND',
           value,
@@ -233,35 +239,25 @@
     / 'Date'
     / instance
 
-  char
-    = unescaped
-    / escape
-      sequence:(
-          '"'
-        / "\\"
-        / "/"
-        / "b" { return "\b"; }
-        / "f" { return "\f"; }
-        / "n" { return "\n"; }
-        / "r" { return "\r"; }
-        / "t" { return "\t"; }
-        / "u" digits:$(HEXDIG HEXDIG HEXDIG HEXDIG) {
-            return String.fromCharCode(parseInt(digits, 16));
-          }
-      )
-      { return sequence; }
+  DoubleStringCharacter
+    = !('"' / "\\") char:. { return char; }
+    / "\\" sequence:EscapeSequence { return sequence; }
 
-  escape
-    = "\\"
+  SingleStringCharacter
+    = !("'" / "\\") char:. { return char; }
+    / "\\" sequence:EscapeSequence { return sequence; }
 
-  unescaped
-    = [^\0-\x1F\x22\x5C]
+  EscapeSequence
+    = "'"
+    / '"'
+    / "\\"
+    / "b"  { return "\b";   }
+    / "f"  { return "\f";   }
+    / "n"  { return "\n";   }
+    / "r"  { return "\r";   }
+    / "t"  { return "\t";   }
+    / "v"  { return "\x0B"; }
 
-  HEXDIG
-    = [0-9a-f]i
-
-  COMMA
-    = ','
   // optional whitespace
   _ "whitespace"
     = [ \t\r\n]*
