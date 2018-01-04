@@ -59,16 +59,24 @@ const nodeReader: {[key: string]: any } = {
     if (!!restNode) {
 
       const expectedKeys = node.value.filter(({type}: AstNode) => type !== AstType.REST).map(({key}: AstNode) => key);
-      const newObj: {[key: string]: any} = {};
-      let restObj: {[key: string]: any} = {};
-
-      Object.keys(input).forEach((key) => {
-        if (contains(key, expectedKeys)) {
-          newObj[key] = input[key];
-        } else {
-          restObj[key] = input[key];
+      const newObj: {[key: string]: any} | boolean = expectedKeys.reduce((acc, key) => {
+        if (typeof input[key] === 'undefined') {
+          return false
         }
-      });
+        acc[key] = input[key];
+        return acc;
+      }, {});
+
+      if(newObj === false) {
+        return FAIL;
+      }
+
+      let restObj: {[key: string]: any} = Object.keys(input).reduce((acc, key) => {
+        if(!contains(key, expectedKeys)) {
+          acc[key] = input[key];
+        }
+        return acc;
+      }, {});
 
       if (restNode.value) {
         const copy = restObj;
@@ -132,15 +140,23 @@ const nodeReader: {[key: string]: any } = {
 
     if (inputContainsRest) {
       const restNode = getRest(node.value) || {} as AstNode;
+      
+      const nthBefore = node.value.findIndex(({ type }: AstNode) => type === AstType.REST);
+      const nthAfter = reverse(node.value).findIndex(({ type }: AstNode) => type === AstType.REST);
+      
+      const restContent = input.slice(nthBefore, input.length - nthAfter);
+      
+      if(restContent.length === 0) {
+        return FAIL;
+      }
+
       if (!restNode.name) {
         return SUCCESS;
       }
-      const nthBefore = node.value.findIndex(({ type }: AstNode) => type === AstType.REST);
-      const nthAfter = reverse(node.value).findIndex(({ type }: AstNode) => type === AstType.REST);
 
       input = [
         ...input.slice(0, nthBefore),
-        input.slice(nthBefore, input.length - nthAfter),
+        restContent,
         ...input.slice(input.length - nthAfter, input.length)
       ];
     }
@@ -200,7 +216,7 @@ const nodeReader: {[key: string]: any } = {
     let childResut = [true, {}];
 
     if (childIndex >= 0) {
-      console.log('FILHO')
+      // console.log('FILHO');
       // console.log('SUb args before', node.value, childIndex);
       const childArgs = node.value.splice(childIndex, 1)[0];
       // console.log('SUb args after', node.value);
@@ -214,12 +230,12 @@ const nodeReader: {[key: string]: any } = {
     }
 
     if (input.length !== node.value.length) {
-      console.log('FAIL', input.length, node.value.length)
+      // console.log('FAIL', input.length, node.value.length);
       return FAIL;
     }
     const result = node.value.map((it: AstNode, index: number) => interpreter({ root: it }, input[index]))
                 .concat([childResut]);
-                console.log('RESULT', result);
+    // console.log('RESULT', result);
     if (result.every(([status, _]: MatchResult) => status === true)) {
       const bind = node.name ? { [node.name]: input } : {};
       return [ true, result.reduce((acc: object, it: MatchResult) => ({ ...acc, ...it[1], ...bind }), {}) ];
