@@ -554,15 +554,20 @@ $ npm run lint
 - http://learnyousomeerlang.com/syntax-in-functions
 
 ## Other nice projects and initiatives
-- [ECMAScript Pattern Matching Syntax - Stage 0 Proposal](https://github.com/tc39/proposal-pattern-matching)
+Syntax proposals:
+- https://github.com/tc39/proposal-pattern-matching
 - https://github.com/eborden/JS-Pattern-Matching
 - https://gist.github.com/bterlson/da8f02b95b484cd4f8d9
-- [Pattern Matching with flow-runtime](https://codemix.github.io/flow-runtime/#/docs/pattern-matching)
-- [Pat-Mat](https://github.com/HerringtonDarkholme/Pat-Mat) - Coffeescript flavored pattern-matching lib.
-- [sparkler](https://github.com/natefaubion/sparkler) - library that implements pattern matching with a custom language level syntax using macros with [sweet.js](https://github.com/sweet-js/sweet-core).
-- [funcy](https://github.com/bramstein/funcy)
-- [match-when](https://github.com/FGRibreau/match-when)
-- [Z-pattern-matching](https://github.com/z-pattern-matching/z)
+
+Other JavaScript libraries:
+- https://codemix.github.io/flow-runtime/#/docs/pattern-matching
+- https://github.com/HerringtonDarkholme/Pat-Mat
+- https://github.com/natefaubion/sparkler
+- https://github.com/bramstein/funcy
+- https://github.com/FGRibreau/match-when
+- https://github.com/z-pattern-matching/z
+- https://github.com/dherman/pattern-match
+- https://github.com/mcollina/bloomrun
 
 ## Contributing
 - Improving or correcting the documentation.
