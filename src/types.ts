@@ -20,14 +20,11 @@ export interface Pattern {
 
 export interface AstNode {
   type: string;
-  // kind: string;
   start?: number;
   end?: number;
-  // raw?: string;
   value?: any;
   name?: any;
   key?: any;
-  values?: any;
   lhs?: any;
   rhs?: any;
 }

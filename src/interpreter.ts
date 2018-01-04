@@ -49,16 +49,16 @@ const nodeReader: {[key: string]: any } = {
 
   [AstType.OBJECT]: (input: {[key: string]: any}, node: AstNode): MatchResult => {
 
-    const restNode = getRest(node.values);
+    const restNode = getRest(node.value);
 
     // tslint:disable-next-line:max-line-length
-    if (!is(input, 'Object') || (!!restNode ? Object.keys(input).length === 0 : Object.keys(input).length !== node.values.length)) {
+    if (!is(input, 'Object') || (!!restNode ? Object.keys(input).length === 0 : Object.keys(input).length !== node.value.length)) {
       return FAIL;
     }
 
     if (!!restNode) {
 
-      const expectedKeys = node.values.filter(({type}: AstNode) => type !== AstType.REST).map(({key}: AstNode) => key);
+      const expectedKeys = node.value.filter(({type}: AstNode) => type !== AstType.REST).map(({key}: AstNode) => key);
       const newObj: {[key: string]: any} = {};
       let restObj: {[key: string]: any} = {};
 
@@ -70,7 +70,7 @@ const nodeReader: {[key: string]: any } = {
         }
       });
 
-      if (restNode.values) {
+      if (restNode.value) {
         const copy = restObj;
         restObj = {};
         Object.keys(copy).map((it) => {
@@ -82,7 +82,7 @@ const nodeReader: {[key: string]: any } = {
       }
 
       const result = Object.keys(input).map((inputKey: string) => {
-        const it = node.values.find(({key}: AstNode) => key === inputKey);
+        const it = node.value.find(({key}: AstNode) => key === inputKey);
         if (it) {
           return interpreter({ root: it}, newObj[inputKey]);
         } else {
@@ -102,7 +102,7 @@ const nodeReader: {[key: string]: any } = {
 
       const result = Object.keys(input).map((inputKey: string, index) => {
 
-        const found = node.values.find(({key}) => key === inputKey);
+        const found = node.value.find(({key}) => key === inputKey);
 
         if (found) {
           return interpreter({root: found}, input[inputKey]);
@@ -120,9 +120,9 @@ const nodeReader: {[key: string]: any } = {
 
   [AstType.LIST]: (input: any[], node: AstNode): MatchResult => {
 
-    const inputContainsRest = hasRest(node.values);
+    const inputContainsRest = hasRest(node.value);
 
-    if (!is(input, 'Array') || (inputContainsRest ? input.length === 0 : input.length !== node.values.length)) {
+    if (!is(input, 'Array') || (inputContainsRest ? input.length === 0 : input.length !== node.value.length)) {
       return FAIL;
     }
 
@@ -131,12 +131,12 @@ const nodeReader: {[key: string]: any } = {
     }
 
     if (inputContainsRest) {
-      const restNode = getRest(node.values) || {} as AstNode;
+      const restNode = getRest(node.value) || {} as AstNode;
       if (!restNode.name) {
         return SUCCESS;
       }
-      const nthBefore = node.values.findIndex(({ type }: AstNode) => type === AstType.REST);
-      const nthAfter = reverse(node.values).findIndex(({ type }: AstNode) => type === AstType.REST);
+      const nthBefore = node.value.findIndex(({ type }: AstNode) => type === AstType.REST);
+      const nthAfter = reverse(node.value).findIndex(({ type }: AstNode) => type === AstType.REST);
 
       input = [
         ...input.slice(0, nthBefore),
@@ -146,7 +146,7 @@ const nodeReader: {[key: string]: any } = {
     }
 
     const matchResult = input.map((inputValue, index) => {
-      return interpreter({root: node.values[index]}, inputValue);
+      return interpreter({root: node.value[index]}, inputValue);
     });
 
     if (matchResult.every(([status, _]) => status === true)) {
@@ -160,14 +160,14 @@ const nodeReader: {[key: string]: any } = {
     return isType(input, node) ? [ true, { [node.value]: input } ] : FAIL;
   },
 
-  [AstType.AS]: (input: any[], node: AstNode): MatchResult => {
-    const [ status, result ] = interpreter({root: node.value}, input);
-    return [ status, {...result, [node.name]: (Object as any ).values(result)} ];
-  },
+  // [AstType.AS]: (input: any[], node: AstNode): MatchResult => {
+  //   const [ status, result ] = interpreter({root: node.value}, input);
+  //   return [ status, {...result, [node.name]: (Object as any ).value(result)} ];
+  // },
 
   [AstType.REST]: (input: any[], node: AstNode): MatchResult => {
-    if (node.values) {
-      const filteredInput = input.map((it) => interpreter({root: node.values}, it))
+    if (node.value) {
+      const filteredInput = input.map((it) => interpreter({root: node.value}, it))
                     .filter(([status, _]) => status)
                     .map(([_, value]) => value);
 
@@ -194,13 +194,35 @@ const nodeReader: {[key: string]: any } = {
   },
 
   [AstType.ARGUMENTS]: (input: any[], node: AstNode): MatchResult => {
+    // console.log('ARGS', input, node);
+    const childIndex = node.value.findIndex(({type}) => type === AstType.ARGUMENTS);
 
-    if (input.length !== node.values.length) {
+    let childResut = [true, {}];
+
+    if (childIndex >= 0) {
+      console.log('FILHO')
+      // console.log('SUb args before', node.value, childIndex);
+      const childArgs = node.value.splice(childIndex, 1)[0];
+      // console.log('SUb args after', node.value);
+      // console.log('SUb args after', childArgs);
+      const size = childArgs.value.length;
+      const subInput = input.slice(0, size);
+      input = input.slice(size, input.length);
+      // console.log('new input', subInput,  input);
+      childResut = interpreter({root: childArgs}, subInput);
+      // console.log('CHILD R', childResut)
+    }
+
+    if (input.length !== node.value.length) {
+      console.log('FAIL', input.length, node.value.length)
       return FAIL;
     }
-    const result = node.values.map((it: AstNode, index: number) => interpreter({ root: it }, input[index]));
+    const result = node.value.map((it: AstNode, index: number) => interpreter({ root: it }, input[index]))
+                .concat([childResut]);
+                console.log('RESULT', result);
     if (result.every(([status, _]: MatchResult) => status === true)) {
-      return [ true, result.reduce((acc: object, it: MatchResult) => ({ ...acc, ...it[1] }), {}) ];
+      const bind = node.name ? { [node.name]: input } : {};
+      return [ true, result.reduce((acc: object, it: MatchResult) => ({ ...acc, ...it[1], ...bind }), {}) ];
     } else {
       return FAIL;
     }
