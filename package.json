@@ -35,7 +35,7 @@
   "author": "Alfonso Filho <alfonsocfilho@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "22.0.0",
+    "@types/jest": "22.0.1",
     "@types/node": "8.5.5",
     "jest": "22.0.4",
     "jest-cli": "22.0.4",
