@@ -12,10 +12,13 @@ const isNullable = (value: any) => {
   if (typeof value === 'undefined' || value === null) {
     return true;
   }
-  if (typeof value === 'string') {
+  if (is(value, ['String', 'Array'])) {
     return value.length === 0;
   }
-  if (typeof value === 'number') {
+  if (is(value, 'Object')) {
+    return Object.keys(value).length === 0;
+  }
+  if (is(value, 'Number')) {
     return value === 0;
   }
   return !!value;
@@ -44,7 +47,14 @@ const isType = (value: any, { typeOf }: any) => {
 const nodeReader: {[key: string]: any } = {
 
   [AstType.LITERAL]: (input: any[], node: AstNode): MatchResult => {
-    return node.value === input && isType(input, node) ? SUCCESS : FAIL;
+    // console.log('LITERAL', input, node);
+    const args = {};
+
+    if (node.name) {
+      args[node.name] = node.value;
+    }
+
+    return node.value === input && isType(input, node) ? [ true, args ] : FAIL;
   },
 
   [AstType.OBJECT]: (input: {[key: string]: any}, node: AstNode): MatchResult => {
@@ -61,18 +71,18 @@ const nodeReader: {[key: string]: any } = {
       const expectedKeys = node.value.filter(({type}: AstNode) => type !== AstType.REST).map(({key}: AstNode) => key);
       const newObj: {[key: string]: any} | boolean = expectedKeys.reduce((acc, key) => {
         if (typeof input[key] === 'undefined') {
-          return false
+          return false;
         }
         acc[key] = input[key];
         return acc;
       }, {});
 
-      if(newObj === false) {
+      if (newObj === false) {
         return FAIL;
       }
 
       let restObj: {[key: string]: any} = Object.keys(input).reduce((acc, key) => {
-        if(!contains(key, expectedKeys)) {
+        if (!contains(key, expectedKeys)) {
           acc[key] = input[key];
         }
         return acc;
@@ -128,6 +138,8 @@ const nodeReader: {[key: string]: any } = {
 
   [AstType.LIST]: (input: any[], node: AstNode): MatchResult => {
 
+    // console.log('LIST', input, node);
+
     const inputContainsRest = hasRest(node.value);
 
     if (!is(input, 'Array') || (inputContainsRest ? input.length === 0 : input.length !== node.value.length)) {
@@ -140,13 +152,13 @@ const nodeReader: {[key: string]: any } = {
 
     if (inputContainsRest) {
       const restNode = getRest(node.value) || {} as AstNode;
-      
+
       const nthBefore = node.value.findIndex(({ type }: AstNode) => type === AstType.REST);
       const nthAfter = reverse(node.value).findIndex(({ type }: AstNode) => type === AstType.REST);
-      
+
       const restContent = input.slice(nthBefore, input.length - nthAfter);
-      
-      if(restContent.length === 0) {
+
+      if (restContent.length === 0) {
         return FAIL;
       }
 
@@ -166,7 +178,11 @@ const nodeReader: {[key: string]: any } = {
     });
 
     if (matchResult.every(([status, _]) => status === true)) {
-      return [ true, matchResult.reduce((acc, it) => ({ ...acc, ...it[1] }), {}) ];
+      const args = {};
+      if (node.name) {
+        args[node.name] = node.value.map(({value}) => value);
+      }
+      return [ true, matchResult.reduce((acc, it) => ({ ...acc, ...it[1] }), args) ];
     } else {
       return FAIL;
     }
@@ -206,7 +222,12 @@ const nodeReader: {[key: string]: any } = {
     if (typeof input !== typeof start || typeof input !== typeof start) {
       return FAIL;
     }
-    return input >= start && input <= end ? SUCCESS : FAIL;
+
+    const args = {};
+    if (node.name) {
+      args[node.name] = input;
+    }
+    return input >= start && input <= end ? [true, args] : FAIL;
   },
 
   [AstType.ARGUMENTS]: (input: any[], node: AstNode): MatchResult => {
