@@ -1,4 +1,4 @@
-import { parse } from './grammar.gen';
+import { parse, ParseFunction } from './grammar.gen';
 import { Pattern } from './types';
 
 const getExpected = (err) => err.map((it) => {
@@ -21,9 +21,9 @@ const makeCaret = (source, location) => {
   }).join('');
 };
 
-export const compile = (source: string): Pattern => {
+export const compile = (source: string, _parse: ParseFunction = parse): Pattern => {
   try {
-    return (parse(source, {}) as Pattern);
+    return (_parse(source, {}) as Pattern);
   } catch (error) {
     throw new Error(`Match-ish Syntax Error:
 ${source}

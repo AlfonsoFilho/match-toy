@@ -32,7 +32,7 @@ export const isNullable = (value: any) => {
   if (typeof value === 'number') {
     return value === 0;
   }
-  return !!value;
+  return false;
 };
 
 export const isType = (value: any, { typeOf }: any) => {
