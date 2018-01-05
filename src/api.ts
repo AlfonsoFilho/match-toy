@@ -32,7 +32,7 @@ export class Matcher {
 
       const [ resultStatus, result ] = interpreter(pattern, value);
 
-      if (resultStatus !== false && guard.call(null, ...value) && typeof predicate === 'function') {
+      if (resultStatus !== false && guard(result) && typeof predicate === 'function') {
         state.matchCallback = predicate;
         state.matchArgs = result;
         state.done = true;
