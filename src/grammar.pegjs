@@ -105,9 +105,7 @@
           value: b === 'true' ? true : false
         }
       }
-	single_quote = '\''
-    doube_quote = '"'
-
+	
   string "string"
     = _ '"' chars:DoubleStringCharacter* '"' _ {
         return {
