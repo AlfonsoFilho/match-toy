@@ -37,14 +37,14 @@
     / logicalOr
 
   logicalOr
-    = lhs:arguments _ '|' _ rhs:logicalOr { return { type: 'OR', lhs, rhs } }
-    / arguments
+    = lhs:sequence _ '|' _ rhs:logicalOr { return { type: 'OR', lhs, rhs } }
+    / sequence
 
-  arguments
+  sequence
     = _ value:(
         head:factor
         tail:(',' _ v:factor _ { return v; })* { return [head].concat(tail) }
-      )? _ { return value !== null ? { type: 'ARGUMENTS', value} : text() }
+      )? _ { return value !== null ? { type: 'SEQUENCE', value} : text() }
 
   factor
     = '(' _ r:logicalAnd _ ')' { return r; }

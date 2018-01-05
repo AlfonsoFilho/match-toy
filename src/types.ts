@@ -39,7 +39,7 @@ export enum AstType {
   LITERAL = 'LITERAL',
   LIST = 'LIST',
   OBJECT = 'OBJECT',
-  ARGUMENTS = 'ARGUMENTS',
+  SEQUENCE = 'SEQUENCE',
   BIND = 'BIND',
   WILDCARD = 'WILDCARD',
   REST = 'REST',
