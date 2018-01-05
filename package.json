@@ -12,6 +12,9 @@
   "browser": "./dist/bundle/index.min.js",
   "types": "./dist/types/index.d.ts",
   "scripts": {
+    "setup": "run-s setup:*",
+    "setup:commit-template": "git config commit.template .gitmessage",
+    "setup:deps": "yarn || npm install",
     "ci": "run-s clean lint build:grammar test:coverage build:bundle build:es5 build:es6",
     "test": "run-s lint build:grammar test:coverage",
     "build": "run-s build:*",
