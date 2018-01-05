@@ -1,6 +1,7 @@
 import { compile } from './compiler';
 import { interpreter } from './interpreter';
 import { AstType } from './types';
+import { FAIL, SUCCESS  } from './constants'
 
 declare let check;
 declare let gen;
@@ -10,8 +11,6 @@ require('jasmine-check').install();
 
 describe('Interpreter', () => {
 
-  const FAIL = [ false, {} ];
-  const SUCCESS = [ true, {} ];
   /**
    * Helper function
    *
@@ -492,6 +491,7 @@ describe('Interpreter', () => {
       expect(run('Nullable', ['1'])).toEqual(FAIL);
       expect(run('Nullable', [[1]])).toEqual(FAIL);
       expect(run('Nullable', [{one: 1}])).toEqual(FAIL);
+      expect(run('Nullable', [new Date()])).toEqual(FAIL);
     });
 
     it('should match typed variables, arrays and wildcards', () => {

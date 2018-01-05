@@ -5,7 +5,11 @@ describe('Helpers', () => {
   describe('is', () => {
     it('should check type', () => {
       expect(is('', 'String')).toBe(true);
+      expect(is(1, ['String', 'Number'])).toBe(true);
+      expect(is('1', ['String', 'Number'])).toBe(true);
+      expect(is(true, ['String', 'Number'])).toBe(false);
       expect(is(1, 'String')).toBe(false);
+      expect(is(1, undefined)).toBe(false);
     });
   });
 
