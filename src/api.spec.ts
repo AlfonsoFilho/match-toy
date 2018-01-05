@@ -64,7 +64,7 @@ describe('API', () => {
   describe('guards', () => {
     it('simple guard', () => {
       const isOneOrTwo = match()
-        .case('1..10', () => 'is even').when((v) => v % 2 === 0)
+        .case('x@1..10', () => 'is even').when(({x}) => x % 2 === 0)
         .case('1..10', () => 'is odd')
         .else(() => 'not a real number')
         .end();
@@ -76,7 +76,7 @@ describe('API', () => {
 
     it('simple guard with many values', () => {
       const isOneOrTwo = match()
-        .case('1..10, x', () => 'is short').when((_, y) => y.length <= 5)
+        .case('1..10, x', () => 'is short').when(({ x }) => x.length <= 5)
         .case('1..10, x', () => 'is big')
         .else(() => 'don\'t match')
         .end();
@@ -127,7 +127,7 @@ describe('API', () => {
     const nestedFn = match()
       .case('_:String, x', ({x}) =>
         match(x)
-          .case('y', ({ y }) => `Value ${y} is even`).when((y) => y % 2 === 0)
+          .case('y', ({ y }) => `Value ${y} is even`).when(({ y }) => y % 2 === 0)
           .case('y', ({ y }) => `Value ${y} is odd`)
           .end())
       .end();
@@ -137,7 +137,7 @@ describe('API', () => {
   describe('alternative syntax', () => {
     it('should be able to define pattern, callback and guard within a with statement', () => {
       const isOneOrTwo = match()
-        .case('x', ({x}) => `${x} is even`, (x) => x % 2 === 0)
+        .case('x', ({x}) => `${x} is even`, ({x}) => x % 2 === 0)
         .case('x', ({x}) => `${x} is odd`)
         .end();
 
@@ -147,7 +147,7 @@ describe('API', () => {
 
     it('should being able to define patten and callback in a single with and a when ', () => {
       const isOneOrTwo = match()
-        .case('x', ({x}) => `${x} is even`).when((x) => x % 2 === 0)
+        .case('x', ({x}) => `${x} is even`).when(({x}) => x % 2 === 0)
         .case('x', ({x}) => `${x} is odd`)
         .end();
 
@@ -157,7 +157,7 @@ describe('API', () => {
 
     it('should being able to define patten, callback and guard separately', () => {
       const isOneOrTwo = match()
-        .case('x').do(({x}) => `${x} is even`).when((x) => x % 2 === 0)
+        .case('x').do(({x}) => `${x} is even`).when(({x}) => x % 2 === 0)
         .case('x', ({x}) => `${x} is odd`)
         .end();
 
@@ -167,7 +167,7 @@ describe('API', () => {
 
     it('should being able to define patten, callback and guard separately on different order', () => {
       const isOneOrTwo = match()
-        .case('x').when((x) => x % 2 === 0).do(({x}) => `${x} is even`)
+        .case('x').when(({x}) => x % 2 === 0).do(({x}) => `${x} is even`)
         .case('x', ({x}) => `${x} is odd`)
         .end();
 

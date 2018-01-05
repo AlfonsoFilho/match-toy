@@ -184,7 +184,7 @@ You can define patterns as much as you want. As you can notice in the example ab
 Guards are a way to declare a condition. It is defined with `when()`:
 ```javascript
 const myFunc = match()
-  .case('x', ({x}) => `${x} is even`).when((x) => x % 2 === 0)
+  .case('x', ({x}) => `${x} is even`).when(({x}) => x % 2 === 0)
   .case('x', ({x}) => `${x} is odd`)
   .end()
 
@@ -197,13 +197,13 @@ In this case, the pattern is exactly the same. But since there is guard defining
 Only one guard per pattern is allowed:
 ```javascript
 const myFunc = match()
-  .case('x, y', () => 'are equal').when((x, y) => x === y)
-  .case('x, y', () => 'x > y').when((x, y) => x > y)
-  .case('x, y', () => 'x < y').when((x, y) => x < y)
+  .case('x, y', () => 'are equal').when(({x, y}) => x === y)
+  .case('x, y', () => 'x > y').when(({x, y}) => x > y)
+  .case('x, y', () => 'x < y').when(({x, y}) => x < y)
 
   .case('x, y', () => 'wrong')
-    .when((x, y) => !!x)
-    .when((x, y) => !!y)  // more than one when() throws an error
+    .when(({x, y}) => !!x)
+    .when(({x, y}) => !!y)  // more than one when() throws an error
 
   .case('x, y', (() => `${x}, ${y}`))
   .end()
@@ -216,15 +216,15 @@ Alternatively, you can define the callback using the `do()`:
 const myFunc = match()
   // Common (and recommended) syntax
   // case(<pattern>, <callback>).when(condition)
-  .case('x, y', () => 'x < y').when((x, y) => x < y)
+  .case('x, y', () => 'x < y').when(({x, y}) => x < y)
   
   // `do` syntax
   // case(<pattern>).do(<callback>).when(condition)
-  .case('x, y').do(() => 'x > y').when((x, y) => x > y)
+  .case('x, y').do(() => 'x > y').when(({x, y}) => x > y)
   
   // `when` and `do` inverted
   // case(<pattern>).when(condition).do(<callback>)
-  .case('x, y').when((x, y) => x > y).do(() => 'x > y')
+  .case('x, y').when(({x, y}) => x > y).do(() => 'x > y')
   
   // Or even you can use only `case`
   // case(<pattern>, <callback>, <condition>)
@@ -281,7 +281,7 @@ You can achieve nesting matching by simply creating a new pattern match inside t
 const myFunc = match()
   .case('0', () => 'is zero')
   .case('_, x', ({x}) => match(x)
-    .case('y', () => 'Y is even').when((y) => y % 2 === 0)
+    .case('y', () => 'Y is even').when(({y}) => y % 2 === 0)
     .case('y', () => 'Y is odd')
     .end())
   .end();
