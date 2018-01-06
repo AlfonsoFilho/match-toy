@@ -281,10 +281,9 @@ describe('Interpreter', () => {
 
   describe.skip('Mapping pattern', () => {
 
-    it('should filter and desconstruct an array', () => {
-      pattern = compile('[...characters({ name: hero, type: "hero", ... })]');
+    it.only('should filter and desconstruct an array', () => {
 
-      expect(interpreter(pattern, [[
+      expect(run('[...characters({ name: hero, type: "hero", ... })]', [[
         { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
         { name: 'IronMan', alterEgo: 'Tony Stark', type: 'hero' },
         { name: 'Doctor Doom', alterEgo: 'Victor Von Doom', type: 'villain' },
@@ -296,9 +295,8 @@ describe('Interpreter', () => {
     });
 
     it('should filter and desconstruct an array with specific schema', () => {
-      pattern = compile('[...characters({ name: hero, type: "hero"})]');
 
-      expect(interpreter(pattern, [[
+      expect(run('[...characters({ name: hero, type: "hero"})]', [[
         { name: 'Spiderman', type: 'hero' },
         { name: 'IronMan', type: 'hero' },
         { name: 'Doctor Doom', type: 'villain' },
@@ -308,7 +306,7 @@ describe('Interpreter', () => {
         { hero: 'IronMan' }
       ]}]);
 
-      expect(interpreter(pattern, [[
+      expect(run('[...characters({ name: hero, type: "hero"})]', [[
         { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
         { name: 'IronMan', alterEgo: 'Tony Stark', type: 'hero' },
         { name: 'Doctor Doom', alterEgo: 'Victor Von Doom', type: 'villain' },
@@ -317,9 +315,8 @@ describe('Interpreter', () => {
     });
 
     it('should redux', () => {
-      pattern = compile('[...todos({ completed: true, text, id })], "SHOW_COMPLETED"');
       // pattern = compile('[...todos({ completed: true, ... } & { completed, text, id })], "SHOW_COMPLETED"');
-      expect(interpreter(pattern, [[
+      expect(run('[...todos({ completed: true, text, id })], "SHOW_COMPLETED"', [[
         { id: 0, text: 'Peter Parker', completed: true },
         { id: 1, text: 'Mary Jane', completed: true },
         { id: 2, text: 'Norman Osborn', completed: false }
@@ -335,9 +332,8 @@ describe('Interpreter', () => {
     });
 
     it('should filter and desconstruct an object', () => {
-      pattern = compile('{...characters({ alterEgo: name, type: "hero"})}');
 
-      expect(interpreter(pattern, [{
+      expect(run('{...characters({ alterEgo: name, type: "hero"})}', [{
         'Spiderman': {alterEgo: 'Peter Parker', type: 'hero' },
         'IronMan': { alterEgo: 'Tony Stark', type: 'hero' },
         'Doctor Doom': { alterEgo: 'Victor Von Doom', type: 'villain' },
@@ -439,21 +435,28 @@ describe('Interpreter', () => {
   describe('As pattern', () => {
 
     it('should match literal', () => {
-      // case('x@1', () => 'code')
+      // case('x@1', ({ x }) => 'code')
       expect(run('x@1', [1])).toEqual([true, { x: 1 }]);
+      expect(run('x@1, y@2', [1, 2])).toEqual([true, { x: 1, y: 2 }]);
       expect(run('x@true', [true])).toEqual([true, { x: true }]);
       expect(run('x@"text"', ['text'])).toEqual([true, { x: 'text' }]);
+      // tslint:disable-next-line:quotemark
+      expect(run("x@'text'", ['text'])).toEqual([true, { x: 'text' }]);
       expect(run('x@(1, 2)', [1, 2])).toEqual([true, { x: [1, 2] }]);
       expect(run('x@(1, 2), 3', [1, 2, 3])).toEqual([true, { x: [1, 2] }]);
       expect(run('x@(1, 2), 3', [1, 2])).toEqual(FAIL);
       expect(run('z@(x, y)', [1, 2])).toEqual([true, { x: 1, y: 2, z: [1, 2] }]);
       expect(run('z@1..5', [3])).toEqual([true, { z: 3 }]);
-      // expect(run('x@(1, 2 | 3, 4)', [1, 2])).toEqual([true, { x: [1, 2] }]);
-      // expect(run('x@(1, 2 | 3, 4)', [3, 4])).toEqual([true, { x: [3, 4] }]);
-      // expect(run('[ x@1, 2, 3 ]', [[1, 2, 3]])).toEqual([true, { x: 1 }]);
+      expect(run('b@a', [3])).toEqual([true, { a: 3 }]);
+        // expect(run('x@(1, 2 | 3, 4)', [1, 2])).toEqual([true, { x: [1, 2] }]);
+        // expect(run('x@(1, 2 | 3, 4)', [3, 4])).toEqual([true, { x: [3, 4] }]);
+      expect(run('[ x@1, 2, 3 ]', [[1, 2, 3]])).toEqual([true, { x: 1 }]);
+      expect(run('z@[ x@1, 2, 3 ]', [[1, 2, 3]])).toEqual([true, { x: 1, z: [1, 2, 3] }]);
+      expect(run('z@[ x@1, 2, 3 ]:Number', [[1, 2, 3]])).toEqual([true, { x: 1, z: [1, 2, 3] }]);
+      // ? expect(run('z@[ x@1, 2, _ ]:Number', [[1, 2, 3]])).toEqual([true, { x: 1, z: [1, 2, 3] }]);
+      expect(run('z@[ x@1, 2, 3 ]:String', [[1, 2, 3]])).toEqual(FAIL);
       expect(run('x@[1, 2, 3]', [[1, 2, 3]])).toEqual([true, { x: [1, 2, 3] }]);
-      // expect(run('x@[...]', [[1, 2, 3]])).toEqual([true, { x: [1, 2, 3] }]);
-      // expect(run('[...x]', [[1, 2, 3]])).toEqual([true, { x: [1, 2, 3] }]);
+      expect(run('x@[...]', [[1, 2, 3]])).toEqual([true, { x: [1, 2, 3] }]);
     });
   });
 

@@ -121,12 +121,16 @@
   array
     = _ '[' _
       value:(
-        head:values
-        tail:(',' _ v:values _ { return v; })*
+        head:array_member
+        tail:(',' _ v:array_member _ { return v; })*
         { return { type: 'LIST', value: [head].concat(tail) } }
       )?
       _ ']' ':'? typeOf:type? _
       { return value !== null ? Object.assign(value, {typeOf}) : { type: 'LIST', value: [], typeOf } ; }
+
+  array_member
+    = name:word '@' v:values { return { ...v, name } }
+    / values
 
   wildcard
     = '_' ':'? typeOf:type? {
