@@ -7,8 +7,11 @@ export const range = (input: string | number, node: AstNode): MatchResult => {
   if (typeof input !== typeof start || typeof input !== typeof start) {
     return FAIL;
   }
-  if (node.name) {
-    args[node.name] = input;
+  if (node.bind) {
+    args[node.bind] = input;
+  }
+  if (node.alias) {
+    args[node.alias] = input;
   }
   return input >= start && input <= end ? [ true, args ] : FAIL;
 };

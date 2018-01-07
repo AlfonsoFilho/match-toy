@@ -1,12 +1,17 @@
 import { parse, ParseFunction } from './grammar.gen';
 import { Pattern } from './types';
 
-const getExpected = (err) => err.map((it) => {
-  if (it.type === 'end') {
-    return ' - end of the code';
+const getExpected = (err) => {
+  if (typeof err === 'string') {
+    return err;
   }
-  return ` - ${it.description || it.text}`;
-}).join('\n');
+  return err.map((it) => {
+    if (it.type === 'end') {
+      return ' - end of the code';
+    }
+    return ` - ${it.description || it.text}`;
+  }).join('\n');
+};
 
 const makeCaret = (source, location) => {
   const start = location.start.offset;

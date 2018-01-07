@@ -279,9 +279,9 @@ describe('Interpreter', () => {
     });
   });
 
-  describe.skip('Mapping pattern', () => {
+  describe('Mapping pattern', () => {
 
-    it.only('should filter and desconstruct an array', () => {
+    it('should filter and desconstruct an array', () => {
 
       expect(run('[...characters({ name: hero, type: "hero", ... })]', [[
         { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
@@ -316,16 +316,14 @@ describe('Interpreter', () => {
 
     it('should redux', () => {
       // pattern = compile('[...todos({ completed: true, ... } & { completed, text, id })], "SHOW_COMPLETED"');
-      expect(run('[...todos({ completed: true, text, id })], "SHOW_COMPLETED"', [[
+      expect(run('[...todos({ completed@: true, text, id })], "SHOW_COMPLETED"', [[
         { id: 0, text: 'Peter Parker', completed: true },
         { id: 1, text: 'Mary Jane', completed: true },
         { id: 2, text: 'Norman Osborn', completed: false }
       ], 'SHOW_COMPLETED'])).toEqual([ true, {
           todos: [
-            { id: 0, text: 'Peter Parker' },
-            { id: 1, text: 'Mary Jane' }
-            // { id: 0, text: 'Peter Parker', completed: true },
-            // { id: 1, text: 'Mary Jane', completed: true }
+            { id: 0, text: 'Peter Parker', completed: true },
+            { id: 1, text: 'Mary Jane', completed: true }
           ]
         }
       ]);
@@ -434,7 +432,7 @@ describe('Interpreter', () => {
 
   describe('As pattern', () => {
 
-    it('should match literal', () => {
+    it('should bind alias on literals', () => {
       // case('x@1', ({ x }) => 'code')
       expect(run('x@1', [1])).toEqual([true, { x: 1 }]);
       expect(run('x@1, y@2', [1, 2])).toEqual([true, { x: 1, y: 2 }]);
@@ -442,21 +440,81 @@ describe('Interpreter', () => {
       expect(run('x@"text"', ['text'])).toEqual([true, { x: 'text' }]);
       // tslint:disable-next-line:quotemark
       expect(run("x@'text'", ['text'])).toEqual([true, { x: 'text' }]);
+
+    });
+
+    it('should bind alias on ranges', () => {
+      expect(run('z@1..5', [3])).toEqual([true, { z: 3 }]);
+    });
+
+    it('should bind alias on variables', () => {
+      expect(run('b@a', [3])).toEqual([true, { a: 3, b: 3 }]);
+    });
+
+    it('should bind alias on arrays', () => {
+      expect(run('x@[1, 2, 3]', [[1, 2, 3]])).toEqual([true, { x: [1, 2, 3] }]);
+      expect(run('[ x@1, 2, 3 ]', [[1, 2, 3]])).toEqual([true, { x: 1 }]);
+      expect(run('[ 1, x@2, 3 ]', [[1, 2, 3]])).toEqual([true, { x: 2 }]);
+      expect(run('z@[ x@1, 2, 3 ]', [[1, 2, 3]])).toEqual([true, { x: 1, z: [1, 2, 3] }]);
+      expect(run('z@[ x@1, 2, 3 ]:Number', [[1, 2, 3]])).toEqual([true, { x: 1, z: [1, 2, 3] }]);
+      // // ? expect(run('z@[ x@1, 2, _ ]:Number', [[1, 2, 3]])).toEqual([true, { x: 1, z: [1, 2, 3] }]);
+      expect(run('z@[ x@1, 2, 3 ]:String', [[1, 2, 3]])).toEqual(FAIL);
+      expect(run('x@[...]', [[1, 2, 3]])).toEqual([true, { x: [1, 2, 3] }]);
+    });
+
+    it('should bind alias on objects', () => {
+      expect(run('x@{one: 1}', [{one: 1}])).toEqual([true, { x: {one: 1} }]);
+      expect(run('{one@: 1}', [{one: 1}])).toEqual([true, { one: 1 }]);
+      expect(run('{one: { two: { three@:3 } }}', [{one: { two: { three: 3 }}}])).toEqual([true, { three: 3 }]);
+      expect(run('x@{one@: 1, two: 2}', [{ one: 1, two: 2 }])).toEqual([true, { x: {one: 1, two: 2}, one: 1 }]);
+    });
+
+    it('should bind alias on sequences', () => {
       expect(run('x@(1, 2)', [1, 2])).toEqual([true, { x: [1, 2] }]);
       expect(run('x@(1, 2), 3', [1, 2, 3])).toEqual([true, { x: [1, 2] }]);
       expect(run('x@(1, 2), 3', [1, 2])).toEqual(FAIL);
       expect(run('z@(x, y)', [1, 2])).toEqual([true, { x: 1, y: 2, z: [1, 2] }]);
-      expect(run('z@1..5', [3])).toEqual([true, { z: 3 }]);
-      expect(run('b@a', [3])).toEqual([true, { a: 3 }]);
-        // expect(run('x@(1, 2 | 3, 4)', [1, 2])).toEqual([true, { x: [1, 2] }]);
+    });
+
+    it.skip('should bind alias with logical', () => {
+        // expect(run('x@(1, 2 | 3, 4, 5)', [1, 2])).toEqual([true, { x: [1, 2] }]);
+        // expect(run('x@(1, 2 | 3, 4, 5)', [3, 4, 5])).toEqual([true, { x: [3, 4, 5] }]);
         // expect(run('x@(1, 2 | 3, 4)', [3, 4])).toEqual([true, { x: [3, 4] }]);
-      expect(run('[ x@1, 2, 3 ]', [[1, 2, 3]])).toEqual([true, { x: 1 }]);
-      expect(run('z@[ x@1, 2, 3 ]', [[1, 2, 3]])).toEqual([true, { x: 1, z: [1, 2, 3] }]);
-      expect(run('z@[ x@1, 2, 3 ]:Number', [[1, 2, 3]])).toEqual([true, { x: 1, z: [1, 2, 3] }]);
-      // ? expect(run('z@[ x@1, 2, _ ]:Number', [[1, 2, 3]])).toEqual([true, { x: 1, z: [1, 2, 3] }]);
-      expect(run('z@[ x@1, 2, 3 ]:String', [[1, 2, 3]])).toEqual(FAIL);
-      expect(run('x@[1, 2, 3]', [[1, 2, 3]])).toEqual([true, { x: [1, 2, 3] }]);
-      expect(run('x@[...]', [[1, 2, 3]])).toEqual([true, { x: [1, 2, 3] }]);
+        expect(run('x@(1 | 2, 3 | 4, 5, 6)', [1])).toEqual([true, { x: [1] }]);
+        expect(run('x@(1 | 2, 3 | 4, 5, 6)', [2, 3])).toEqual([true, { x: [2, 3] }]);
+        // expect(run('x@(1 | 2, 3 | 4, 5, 6)', [4, 5, 6])).toEqual([true, { x: [4, 5, 6] }]);
+    });
+  });
+
+  describe('Sequences', () => {
+    it('should match simple sequence', () => {
+      expect(run('1, 2, 3', [1, 2, 3])).toEqual(SUCCESS);
+      expect(run('1, 2, 3', [1, 2, 3, 4])).toEqual(FAIL);
+      expect(run('1, 2, 3', [1, 2])).toEqual(FAIL);
+      expect(run('1, 2, 3', [])).toEqual(FAIL);
+    });
+
+    it('should throw an error', () => {
+      expect(() => {
+        run('()', [1, 2, 3]);
+      }).toThrowError();
+    });
+
+    it('should match grouped sequences', () => {
+      expect(run('(1, 2), 3', [1, 2, 3])).toEqual(SUCCESS);
+      expect(run('(1, 2), 3', [1, 2, 3, 4])).toEqual(FAIL);
+      expect(run('(1, 2), 3', [1, 2])).toEqual(FAIL);
+      expect(run('(1, 2, 3)', [1, 2, 3])).toEqual(SUCCESS);
+      expect(run('(1, 2), 3, (4, 5)', [1, 2, 3, 4, 5])).toEqual(SUCCESS);
+      expect(run('(1, (2)), 3', [1, 2, 3])).toEqual(SUCCESS);
+
+      expect(run('1, ((2, (3, (4, 5))), 6)', [1, 2, 3, 4, 5, 6])).toEqual(SUCCESS);
+      expect(run('1, ((2, (3, (4, 5))), 6)', [1, 2, 3, 4, 7, 6])).toEqual(FAIL);
+      expect(run('1, ((2, (3, (4, 5))), 6)', [1, 2, 3, 4])).toEqual(FAIL);
+      expect(run('((1, 2), 3)', [1, 2, 3])).toEqual(SUCCESS);
+      expect(run('((1, (2)), 3)', [1, 2, 3])).toEqual(SUCCESS);
+      expect(run('(((1, (2)), 3))', [1, 2, 3])).toEqual(SUCCESS);
+      expect(run('(1), (2), (3)', [1, 2, 3])).toEqual(SUCCESS);
     });
   });
 
@@ -520,7 +578,7 @@ describe('Interpreter', () => {
     });
   });
 
-  describe.skip('Errors', () => {
+  describe('Errors', () => {
     it('should throw a error with a friendly message', () => {
       expect(() => {
         compile('1x');

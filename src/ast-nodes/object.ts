@@ -40,7 +40,7 @@ export const object = (input: {[key: string]: any}, node: AstNode): MatchResult 
       Object.keys(copy).map((it) => {
         const [ status, restResult ] = interpreter({root: restNode}, [copy[it]]);
         if (status) {
-          restObj[it] = restResult[restNode.name][0];
+          restObj[it] = restResult[restNode.bind][0];
         }
       });
     }
@@ -56,7 +56,7 @@ export const object = (input: {[key: string]: any}, node: AstNode): MatchResult 
 
     if (result.every(([status, _]) => status === true)) {
       const resultArgs = result.reduce((acc, it) => it ? ({ ...acc, ...it[1] }) : acc, {});
-      const boundRest = restNode.name ? { [restNode.name]: restObj } : {};
+      const boundRest = restNode.bind ? { [restNode.bind]: restObj } : {};
       return [ true, { ...resultArgs, ...boundRest} ];
     } else {
       return FAIL;
@@ -75,7 +75,11 @@ export const object = (input: {[key: string]: any}, node: AstNode): MatchResult 
     });
 
     if (result.every(([status, _]) => status === true)) {
-      return [ true, result.reduce((acc, it) => ({ ...acc, ...it[1] }), {}) ];
+      const args = {};
+      if (node.alias) {
+        args[node.alias] = input;
+      }
+      return [ true, result.reduce((acc, it) => ({ ...acc, ...it[1] }), args) ];
     } else {
       return FAIL;
     }

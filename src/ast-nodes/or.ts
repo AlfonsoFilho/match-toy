@@ -9,8 +9,14 @@ export const or = (input: any[], node: AstNode): MatchResult => {
   const [ lhsStatus, lhsResult ] = interpreter({root: lhs}, input);
   const [ rhsStatus, rhsResult ] = interpreter({root: rhs}, input);
 
+  const args = {};
+
+  if (node.alias) {
+    args[node.alias] = input;
+  }
+
   if (lhsStatus || rhsStatus) {
-    return [ true, lhsStatus ? lhsResult : rhsResult ];
+    return [ true, { ...(lhsStatus ? lhsResult : rhsResult), ...args} ];
   } else {
     return FAIL;
   }
