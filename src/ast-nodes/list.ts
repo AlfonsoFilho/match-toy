@@ -18,7 +18,7 @@ export const list = (input: any[], node: AstNode): MatchResult => {
   }
 
   if (inputContainsRest) {
-    // console.log('has rest', inputContainsRest);
+
     const restNode = getRest(node.value) || {} as AstNode;
 
     const nthBefore = node.value.findIndex(({ type }: AstNode) => type === AstType.REST);
@@ -31,11 +31,14 @@ export const list = (input: any[], node: AstNode): MatchResult => {
     }
 
     const args = {};
-    if (node.name) {
-      args[node.name] = restContent;
+    if (node.bind) {
+      args[node.bind] = restContent;
+    }
+    if (node.alias) {
+      args[node.alias] = restContent;
     }
 
-    if (!restNode.name) {
+    if (!restNode.bind) {
       return [ true, args ];
     }
 
@@ -52,8 +55,12 @@ export const list = (input: any[], node: AstNode): MatchResult => {
 
   if (matchResult.every(([status, _]) => status === true)) {
     const args = {};
-    if (node.name) {
-      args[node.name] = node.value.map(({value}) => value);
+    if (node.bind) {
+      args[node.bind] = node.value.map(({value}) => value);
+    }
+
+    if (node.alias) {
+      args[node.alias] = node.value.map(({value}) => value);
     }
     return [ true, matchResult.reduce((acc, it) => ({ ...acc, ...it[1] }), args) ];
   } else {

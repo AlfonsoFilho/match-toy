@@ -3,37 +3,85 @@ import { isType } from '../helpers';
 import { interpreter } from '../interpreter';
 import { AstNode, AstType, MatchResult } from '../types';
 
-export const sequence = (input: any[], node: AstNode): MatchResult => {
-  // console.log('ARGS', input, node);
-  const childIndex = node.value.findIndex(({type}) => type === AstType.SEQUENCE);
-
-  let childResut = [true, {}];
-
-  if (childIndex >= 0) {
-    // console.log('FILHO');
-    // console.log('SUb args before', node.value, childIndex);
-    const childArgs = node.value.splice(childIndex, 1)[0];
-    // console.log('SUb args after', node.value);
-    // console.log('SUb args after', childArgs);
-    const size = childArgs.value.length;
-    const subInput = input.slice(0, size);
-    input = input.slice(size, input.length);
-    // console.log('new input', subInput,  input);
-    childResut = interpreter({root: childArgs}, subInput);
-    // console.log('CHILD R', childResut)
-  }
-
-  if (input.length !== node.value.length) {
-    // console.log('FAIL', input.length, node.value.length);
-    return FAIL;
-  }
-  const result = node.value.map((it: AstNode, index: number) => interpreter({ root: it }, input[index]))
-              .concat([childResut]);
-  // console.log('RESULT', result);
+const allValid = (result, input, node): MatchResult => {
   if (result.every(([status, _]: MatchResult) => status === true)) {
-    const bind = node.name ? { [node.name]: input } : {};
-    return [ true, result.reduce((acc: object, it: MatchResult) => ({ ...acc, ...it[1], ...bind }), {}) ];
+    const alias = node.alias ? { [node.alias]: input } : {};
+    return [ true, result.reduce((acc: object, it: MatchResult) => ({ ...acc, ...it[1], ...alias }), {}) ];
   } else {
     return FAIL;
   }
+};
+
+const flatSeq = (a) => a.value.reduce((acc, it) => {
+    if (it.type === AstType.SEQUENCE) {
+      acc = acc + flatSeq(it);
+    } else {
+      acc = acc + 1;
+    }
+    return acc;
+  }, 0);
+
+const flatLogical = ({ lhs, rhs }) => {
+  const L = [ lhs, rhs ].map((it) => {
+    if (it.type === AstType.OR) {
+      return flatLogical(it);
+    } else {
+      return flatSeq(it);
+    }
+  });
+
+  return L;
+};
+
+export const sequence = (input: any[], node: AstNode): MatchResult => {
+  // console.log('SEQ', input, node)
+  let currentIndex = 0;
+
+  const result = node.value.map((it) => {
+
+    // NOTE: Iterate sequce. TEST OK
+    if (it.type === AstType.SEQUENCE) {
+      const L = flatSeq(it);
+      const r = sequence(input.slice(currentIndex, currentIndex + L), it);
+      currentIndex = currentIndex + L;
+      return r;
+    }
+
+    // NOTE: Iterate logic. VERY BUGGY
+    if (it.type === AstType.OR) {
+
+      const [ lhsLength, rhsLength ] = flatLogical(it);
+
+      const subNewInput = input.slice(currentIndex, currentIndex + lhsLength);
+      const LL = interpreter({ root: it.lhs }, subNewInput);
+      const [ lhsStatus, lhsResult ]  = interpreter({ root: it.lhs }, subNewInput);
+
+      const args = {};
+
+      if (lhsStatus === true) {
+        if (it.alias) {
+          args[it.alias] = subNewInput;
+        }
+        currentIndex = currentIndex + lhsLength;
+        return [ lhsStatus, { ...lhsResult, ...args } ];
+      } else {
+        // Right side buggy
+        // console.log('RHS', rhsLength);
+        // console.log('RHS', it.rhs);
+        // const r = sequence(input.slice(currentIndex, currentIndex + rhsLength), { value: [it.rhs] });
+      }
+    }
+
+    // NOTE: Iterate value. TEST OK
+    const nr = interpreter({ root: it }, input[currentIndex]);
+    currentIndex++;
+    return nr;
+  });
+
+  if (input.length !== currentIndex) {
+    // console.log('FAIL', input, currentIndex);
+    return FAIL;
+  }
+  // console.log('result', result)
+  return allValid(result, input, node);
 };

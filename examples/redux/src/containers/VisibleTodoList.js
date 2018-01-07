@@ -22,8 +22,8 @@ const getVisibleTodos = (todos, filter) => {
 // Refactored using Match-ish
 const getVisibleTodos = match()
   .with('todos, "SHOW_ALL"', ({todos}) => todos)
-  .with('[...todos({ completed: true, id, text })], "SHOW_COMPLETED"', ({todos}) => todos.map(it => ({ ...it, completed: true })))
-  .with('[...todos({ completed: false, id, text })], "SHOW_ACTIVE"', ({todos}) => todos.map(it => ({ ...it, completed: false })))
+  .with('[...todos({ completed@: true, id, text })], "SHOW_COMPLETED"', ({todos}) => todos)
+  .with('[...todos({ completed@: false, id, text })], "SHOW_ACTIVE"', ({todos}) => todos)
   .with('_, filter', ({filter}) => { 
     throw new Error('Unknown filter: ' + filter);
   })

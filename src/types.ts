@@ -7,7 +7,6 @@ export type MatchFail = [ false, {[key: string]: any} ];
 export type MatchResult = MatchSucess | MatchFail | [ boolean, {[key: string]: any} ];
 export type AnyFn = (...args: any[]) => any;
 export type BoolFn = (...args: any[]) => boolean;
-// export type Literal = number | string;
 
 // INTERFACES
 export interface Pattern {
@@ -23,10 +22,11 @@ export interface AstNode {
   start?: number;
   end?: number;
   value?: any;
-  name?: any;
-  key?: any;
-  lhs?: any;
-  rhs?: any;
+  bind?: string;
+  alias?: string;
+  key?: string;
+  lhs?: AstNode;
+  rhs?: AstNode;
 }
 
 export interface MatchItem {

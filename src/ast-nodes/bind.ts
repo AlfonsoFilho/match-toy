@@ -3,5 +3,10 @@ import { isType } from '../helpers';
 import { AstNode, MatchResult } from '../types';
 
 export const bind = (input: any[], node: AstNode): MatchResult => {
-  return isType(input, node) ? [ true, { [node.value]: input } ] : FAIL;
+  const args = {};
+  args[node.bind] = input;
+  if (node.alias) {
+    args[node.alias] = input;
+  }
+  return isType(input, node) ? [ true, args ] : FAIL;
 };

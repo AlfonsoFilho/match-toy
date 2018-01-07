@@ -4,8 +4,11 @@ import { AstNode, MatchResult } from '../types';
 
 export const literal = (input: any[], node: AstNode): MatchResult => {
   const args = {};
-  if (node.name) {
-    args[node.name] = input;
+  if (node.bind) {
+    args[node.bind] = input;
+  }
+  if (node.alias) {
+    args[node.alias] = input;
   }
   return node.value === input && isType(input, node) ? [ true, args ] : FAIL;
 };
