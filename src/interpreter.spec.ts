@@ -1,7 +1,7 @@
 import { compile } from './compiler';
+import { FAIL, SUCCESS  } from './constants';
 import { interpreter } from './interpreter';
 import { AstType } from './types';
-import { FAIL, SUCCESS  } from './constants'
 
 declare let check;
 declare let gen;
@@ -246,12 +246,12 @@ describe('Interpreter', () => {
 
     it('should match destructuring objects', () => {
       // case('{ a: 1, ...tail }', ({ tail }) => 'code')
-      expect(run('{ a: 1, ...tail }', [{ a: 1, c: 3, b: 2}])).toEqual([ true, {tail: {b:2, c:3}} ]);
+      expect(run('{ a: 1, ...tail }', [{ a: 1, c: 3, b: 2}])).toEqual([ true, {tail: {b: 2, c: 3}} ]);
       expect(run('{ a: 1, ... }', [{ a: 1, c: 3, b: 2}])).toEqual(SUCCESS);
       expect(run('{...}', [{ a: 1, c: 3, b: 2}])).toEqual(SUCCESS);
       expect(run('{...}', [{}])).toEqual(FAIL);
-      expect(run('{ a: 1, ...bc, d: x }', [{ a: 1, b: 2, c: 3, d: 4}])).toEqual([ true, {x: 4, bc: {b:2, c:3}} ]);
-      expect(run('{ a: 1, ...bc, d: 4 }', [{ a: 1, b: 2, c: 3, d: 4}])).toEqual([ true, {bc: {b:2, c:3}} ]);
+      expect(run('{ a: 1, ...bc, d: x }', [{ a: 1, b: 2, c: 3, d: 4}])).toEqual([ true, {x: 4, bc: {b: 2, c: 3}} ]);
+      expect(run('{ a: 1, ...bc, d: 4 }', [{ a: 1, b: 2, c: 3, d: 4}])).toEqual([ true, {bc: {b: 2, c: 3}} ]);
       expect(run('{ a: 1, ...bc, d: 4 }', [{ a: 1, b: 2, c: 3}])).toEqual(FAIL);
     });
   });
@@ -592,6 +592,18 @@ describe('Interpreter', () => {
         compile('1x');
       }).toThrowError(expect.stringMatching('Match-ish Syntax Error'));
     });
+  });
+
+  describe.skip('QuickCheck', () => {
+    check.it('should match in a range of numbers', gen.number, gen.int, gen.int, (x, start, end) => {
+
+      if (x >=  start && x <= end) {
+        expect(run(`${start}..${end}`, [x])).toEqual(SUCCESS);
+      } else {
+        expect(run(`${start}..${end}`, [x])).toEqual(FAIL);
+      }
+    });
+
   });
 
   // describe.skip('Doc Examples', () => {});

@@ -17,7 +17,17 @@ export interface Pattern {
   root: AstNode;
 }
 
+export interface Location {
+  start: {
+    offset: number
+  };
+  end: {
+    offset: number
+  };
+}
+
 export interface AstNode {
+  [key: string]: any;
   type: string;
   start?: number;
   end?: number;

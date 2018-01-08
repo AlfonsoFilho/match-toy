@@ -1,5 +1,4 @@
-import { FAIL, SUCCESS } from '../constants';
-import { isType } from '../helpers';
+import { FAIL } from '../constants';
 import { AstNode, MatchResult } from '../types';
 
 export const regexp = (input: string, node: AstNode): MatchResult => {

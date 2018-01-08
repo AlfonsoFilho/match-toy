@@ -57,4 +57,9 @@ export const isType = (value: any, { typeOf }: any) => {
 
 export const getRest = (list: AstNode[] = []) => list.find(({ type }) => type === AstType.REST);
 
-export const hasRest = (list: AstNode[]) => !!getRest(list);
+export const addProp = (prop: string) => (node: AstNode, value: any): object =>
+  node[prop] ? { [node[prop]]: value } : {};
+
+export const addBind = addProp('bind');
+
+export const addAlias = addProp('alias');

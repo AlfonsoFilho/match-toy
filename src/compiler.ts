@@ -1,7 +1,7 @@
 import { parse, ParseFunction } from './grammar.gen';
-import { Pattern } from './types';
+import { Location, Pattern } from './types';
 
-const getExpected = (err) => {
+const getExpected = (err: string | any[]) => {
   if (typeof err === 'string') {
     return err;
   }
@@ -13,11 +13,11 @@ const getExpected = (err) => {
   }).join('\n');
 };
 
-const makeCaret = (source, location) => {
+const makeCaret = (source: string, location: Location) => {
   const start = location.start.offset;
   const end = location.end.offset;
 
-  return source.split('').map((it, index) => {
+  return source.split('').map((_, index) => {
     if (index < start || index > end) {
       return ' ';
     } else {

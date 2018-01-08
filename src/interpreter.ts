@@ -1,7 +1,5 @@
 import { and, bind, list, literal, object, or, range, regexp, rest, sequence, wildcard } from './ast-nodes/index';
-import { FAIL, SUCCESS } from './constants';
-import { contains, is, isType, reverse } from './helpers';
-import { AstNode, AstType, MatchFail, MatchResult, MatchSucess, Pattern } from './types';
+import { AstType, MatchResult, Pattern } from './types';
 
 const astNodesMapping: {[key: string]: any } = {
   [AstType.LITERAL]:  literal,
