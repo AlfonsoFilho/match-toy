@@ -476,13 +476,21 @@ describe('Interpreter', () => {
       expect(run('z@(x, y)', [1, 2])).toEqual([true, { x: 1, y: 2, z: [1, 2] }]);
     });
 
-    it.skip('should bind alias with logical', () => {
-        // expect(run('x@(1, 2 | 3, 4, 5)', [1, 2])).toEqual([true, { x: [1, 2] }]);
-        // expect(run('x@(1, 2 | 3, 4, 5)', [3, 4, 5])).toEqual([true, { x: [3, 4, 5] }]);
-        // expect(run('x@(1, 2 | 3, 4)', [3, 4])).toEqual([true, { x: [3, 4] }]);
+    it('should bind alias with logical or', () => {
+        expect(run('x@(1, 2 | 3, 4, 5)', [1, 2])).toEqual([true, { x: [1, 2] }]);
+        expect(run('x@(1, 2 | 3, 4, 5)', [3, 4, 5])).toEqual([true, { x: [3, 4, 5] }]);
+        expect(run('x@(1, 2 | 3, 4)', [3, 4])).toEqual([true, { x: [3, 4] }]);
         expect(run('x@(1 | 2, 3 | 4, 5, 6)', [1])).toEqual([true, { x: [1] }]);
         expect(run('x@(1 | 2, 3 | 4, 5, 6)', [2, 3])).toEqual([true, { x: [2, 3] }]);
-        // expect(run('x@(1 | 2, 3 | 4, 5, 6)', [4, 5, 6])).toEqual([true, { x: [4, 5, 6] }]);
+        expect(run('x@(1 | 2, 3 | 4, 5, 6)', [4, 5, 6])).toEqual([true, { x: [4, 5, 6] }]);
+    });
+
+    it('should bind alias with logical and', () => {
+      expect(run('x@(1, _ & _, 2)', [1, 2])).toEqual([true, { x: [1, 2] }]);
+      expect(run('x@(1, _ & _, 2)', [1, 3])).toEqual(FAIL);
+      expect(run('x@(1, _ & _, 2)', [1, 2, 3])).toEqual(FAIL);
+      expect(run('x@(1, _, _ & _, 2, _ & _, _, 3)', [1, 2, 3])).toEqual([true, { x: [1, 2, 3] }]);
+      expect(run('x@(1, Number & _, a)', [1, 2])).toEqual([true, { x: [1, 2], a: 2 }]);
     });
   });
 
