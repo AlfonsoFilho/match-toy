@@ -14,5 +14,6 @@ exclude_patterns:
 - "**/*.spec.ts"
 - "**/*.d.ts"
 - "**/node_modules/"
+- "**/examples/"
 - "dist/"
 - "coverage/"

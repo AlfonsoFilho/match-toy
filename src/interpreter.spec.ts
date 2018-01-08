@@ -594,17 +594,5 @@ describe('Interpreter', () => {
     });
   });
 
-  describe.skip('QuickCheck', () => {
-    check.it('should match in a range of numbers', gen.number, gen.int, gen.int, (x, start, end) => {
-
-      if (x >=  start && x <= end) {
-        expect(run(`${start}..${end}`, [x])).toEqual(SUCCESS);
-      } else {
-        expect(run(`${start}..${end}`, [x])).toEqual(FAIL);
-      }
-    });
-
-  });
-
   // describe.skip('Doc Examples', () => {});
 });
