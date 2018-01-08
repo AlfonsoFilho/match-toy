@@ -21,25 +21,12 @@ const flatSeq = (a) => a.value.reduce((acc, it) => {
     return acc;
   }, 0);
 
-const flatLogical = ({ lhs, rhs }) => {
-  const L = [ lhs, rhs ].map((it) => {
-    if (it.type === AstType.OR) {
-      return flatLogical(it);
-    } else {
-      return flatSeq(it);
-    }
-  });
-
-  return L;
-};
-
 export const sequence = (input: any[], node: AstNode): MatchResult => {
-  // console.log('SEQ', input, node)
+
   let currentIndex = 0;
 
   const result = node.value.map((it) => {
 
-    // NOTE: Iterate sequce. TEST OK
     if (it.type === AstType.SEQUENCE) {
       const L = flatSeq(it);
       const r = sequence(input.slice(currentIndex, currentIndex + L), it);
@@ -47,41 +34,25 @@ export const sequence = (input: any[], node: AstNode): MatchResult => {
       return r;
     }
 
-    // NOTE: Iterate logic. VERY BUGGY
-    if (it.type === AstType.OR) {
-
-      const [ lhsLength, rhsLength ] = flatLogical(it);
-
-      const subNewInput = input.slice(currentIndex, currentIndex + lhsLength);
-      const LL = interpreter({ root: it.lhs }, subNewInput);
-      const [ lhsStatus, lhsResult ]  = interpreter({ root: it.lhs }, subNewInput);
+    if (it.type === AstType.OR || it.type === AstType.AND) {
+      const [ s, r ] = interpreter({ root: it }, input);
+      currentIndex = currentIndex + input.length;
 
       const args = {};
-
-      if (lhsStatus === true) {
-        if (it.alias) {
-          args[it.alias] = subNewInput;
-        }
-        currentIndex = currentIndex + lhsLength;
-        return [ lhsStatus, { ...lhsResult, ...args } ];
-      } else {
-        // Right side buggy
-        // console.log('RHS', rhsLength);
-        // console.log('RHS', it.rhs);
-        // const r = sequence(input.slice(currentIndex, currentIndex + rhsLength), { value: [it.rhs] });
+      if (it.alias) {
+        args[it.alias] = input;
       }
+      return [ s, { ...r, ...args } ];
     }
 
-    // NOTE: Iterate value. TEST OK
     const nr = interpreter({ root: it }, input[currentIndex]);
     currentIndex++;
     return nr;
   });
 
   if (input.length !== currentIndex) {
-    // console.log('FAIL', input, currentIndex);
     return FAIL;
   }
-  // console.log('result', result)
+
   return allValid(result, input, node);
 };
