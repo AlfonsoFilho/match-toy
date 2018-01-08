@@ -1,18 +1,21 @@
-import { FAIL, SUCCESS } from '../constants';
-import { isType } from '../helpers';
+import { FAIL } from '../constants';
+import { addAlias } from '../helpers';
 import { interpreter } from '../interpreter';
 import { AstNode, AstType, MatchResult } from '../types';
 
-const allValid = (result, input, node): MatchResult => {
+const validate = (result: MatchResult[], input: any[], node: AstNode): MatchResult => {
   if (result.every(([status, _]: MatchResult) => status === true)) {
-    const alias = node.alias ? { [node.alias]: input } : {};
-    return [ true, result.reduce((acc: object, it: MatchResult) => ({ ...acc, ...it[1], ...alias }), {}) ];
+    return [
+      true,
+      result.reduce((acc: object, [_, itemResult]: MatchResult) =>
+        ({ ...acc, ...itemResult, ...addAlias(node, input) }), {})
+    ];
   } else {
     return FAIL;
   }
 };
 
-const flatSeq = (a) => a.value.reduce((acc, it) => {
+const flatSeq = (a: AstNode) => a.value.reduce((acc: number, it: AstNode) => {
     if (it.type === AstType.SEQUENCE) {
       acc = acc + flatSeq(it);
     } else {
@@ -25,24 +28,20 @@ export const sequence = (input: any[], node: AstNode): MatchResult => {
 
   let currentIndex = 0;
 
-  const result = node.value.map((it) => {
+  const result = node.value.map((it: AstNode) => {
 
     if (it.type === AstType.SEQUENCE) {
-      const L = flatSeq(it);
-      const r = sequence(input.slice(currentIndex, currentIndex + L), it);
-      currentIndex = currentIndex + L;
-      return r;
+      const sequenceLength = flatSeq(it);
+      const sequenceResult = sequence(input.slice(currentIndex, currentIndex + sequenceLength), it);
+      currentIndex = currentIndex + sequenceLength;
+      return sequenceResult;
     }
 
     if (it.type === AstType.OR || it.type === AstType.AND) {
       const [ s, r ] = interpreter({ root: it }, input);
       currentIndex = currentIndex + input.length;
 
-      const args = {};
-      if (it.alias) {
-        args[it.alias] = input;
-      }
-      return [ s, { ...r, ...args } ];
+      return [ s, { ...r, ...addAlias(node, input) } ];
     }
 
     const nr = interpreter({ root: it }, input[currentIndex]);
@@ -54,5 +53,5 @@ export const sequence = (input: any[], node: AstNode): MatchResult => {
     return FAIL;
   }
 
-  return allValid(result, input, node);
+  return validate(result, input, node);
 };

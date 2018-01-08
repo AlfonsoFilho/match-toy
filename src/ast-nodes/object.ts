@@ -1,11 +1,11 @@
-import { FAIL, SUCCESS } from '../constants';
-import { contains, getRest, is, isType } from '../helpers';
+import { FAIL } from '../constants';
+import { addAlias, contains, getRest, is } from '../helpers';
 import { interpreter } from '../interpreter';
 import { AstNode, AstType, MatchResult } from '../types';
 
 export const object = (input: {[key: string]: any}, node: AstNode): MatchResult => {
 
-  const restNode = getRest(node.value);
+  const restNode: AstNode = getRest(node.value) as AstNode;
 
   // tslint:disable-next-line:max-line-length
   if (!is(input, 'Object') || (!!restNode ? Object.keys(input).length === 0 : Object.keys(input).length !== node.value.length)) {
@@ -15,7 +15,8 @@ export const object = (input: {[key: string]: any}, node: AstNode): MatchResult 
   if (!!restNode) {
 
     const expectedKeys = node.value.filter(({type}: AstNode) => type !== AstType.REST).map(({key}: AstNode) => key);
-    const newObj: {[key: string]: any} | boolean = expectedKeys.reduce((acc, key) => {
+
+    const newObj: {[key: string]: any} = expectedKeys.reduce((acc: {[key: string]: any}, key: string) => {
       if (typeof input[key] === 'undefined') {
         return false;
       }
@@ -23,11 +24,11 @@ export const object = (input: {[key: string]: any}, node: AstNode): MatchResult 
       return acc;
     }, {});
 
-    if (newObj === false) {
+    if (!newObj) {
       return FAIL;
     }
 
-    let restObj: {[key: string]: any} = Object.keys(input).reduce((acc, key) => {
+    let restObj: {[key: string]: any} = Object.keys(input).reduce((acc: {[key: string]: any}, key) => {
       if (!contains(key, expectedKeys)) {
         acc[key] = input[key];
       }
@@ -39,7 +40,7 @@ export const object = (input: {[key: string]: any}, node: AstNode): MatchResult 
       restObj = {};
       Object.keys(copy).map((it) => {
         const [ status, restResult ] = interpreter({root: restNode}, [copy[it]]);
-        if (status) {
+        if (status && restNode.bind) {
           restObj[it] = restResult[restNode.bind][0];
         }
       });
@@ -64,9 +65,9 @@ export const object = (input: {[key: string]: any}, node: AstNode): MatchResult 
 
   } else {
 
-    const result = Object.keys(input).map((inputKey: string, index) => {
+    const result = Object.keys(input).map((inputKey: string) => {
 
-      const found = node.value.find(({key}) => key === inputKey);
+      const found = node.value.find(({ key }: AstNode) => key === inputKey);
 
       if (found) {
         return interpreter({root: found}, input[inputKey]);
@@ -75,11 +76,7 @@ export const object = (input: {[key: string]: any}, node: AstNode): MatchResult 
     });
 
     if (result.every(([status, _]) => status === true)) {
-      const args = {};
-      if (node.alias) {
-        args[node.alias] = input;
-      }
-      return [ true, result.reduce((acc, it) => ({ ...acc, ...it[1] }), args) ];
+      return [ true, result.reduce((acc, it) => ({ ...acc, ...it[1] }), addAlias(node, input)) ];
     } else {
       return FAIL;
     }
