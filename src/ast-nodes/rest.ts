@@ -2,7 +2,7 @@ import { addBind } from '../helpers';
 import { interpreter } from '../interpreter';
 import { AstNode, MatchResult } from '../types';
 
-const mappingPattern = (input: any[] = [], node: AstNode) =>
+const mappingPattern = (input: any[], node: AstNode) =>
   input
     .map((it) => interpreter({root: node.value}, it))
     .filter(([status, _]) => status)
