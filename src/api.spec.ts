@@ -5,12 +5,36 @@ import { ErrorMessages } from './types';
 describe('API', () => {
   describe('basic match value', () => {
 
-    it('should return predicate result', () => {
+    it('should return match result', () => {
       const matchResult = match(1)
         .case('1', () => 'one')
         .end();
 
       expect(matchResult).toBe('one');
+    });
+
+    it('should return match result with many inputs', () => {
+      const matchResult = match(1, 2)
+        .case('1, 2', () => 'one and two')
+        .end();
+
+      expect(matchResult).toBe('one and two');
+    });
+
+    it('should return match result using return()', () => {
+      const matchResult = match()
+        .case('1', () => 'one')
+        .return(1);
+
+      expect(matchResult).toBe('one');
+    });
+
+    it('should return match result with many inputs using return()', () => {
+      const matchResult = match()
+        .case('1, 2', () => 'one and two')
+        .return(1, 2);
+
+      expect(matchResult).toBe('one and two');
     });
 
     it('should have alias with()', () => {

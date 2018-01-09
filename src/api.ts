@@ -9,7 +9,7 @@ export class Matcher {
   private elseValue: AnyFn;
   private catchCallback: any;
 
-  constructor(value?: any) {
+  constructor(value?: any[]) {
     this.initialValues = value;
     this.matchList = [];
     this.elseValue = () => undefined;
@@ -83,6 +83,11 @@ export class Matcher {
   public catch(func: AnyFn): Matcher {
     this.catchCallback = func;
     return this;
+  }
+
+  public return(...value: any[]) {
+    this.initialValues = value;
+    return this.runMatch(this.initialValues);
   }
 
   public end()  {
