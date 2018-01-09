@@ -1,6 +1,11 @@
-
 import { match } from './api';
 import { ErrorMessages } from './types';
+
+declare let check;
+declare let gen;
+
+// tslint:disable-next-line:no-var-requires
+require('jasmine-check').install();
 
 describe('API', () => {
   describe('basic match value', () => {
@@ -11,6 +16,14 @@ describe('API', () => {
         .end();
 
       expect(matchResult).toBe('one');
+    });
+
+    check.it('should match numbers', gen.number, (value) => {
+      const matchResult = match()
+        .case(`${value}`, true)
+        .return(value);
+
+      expect(matchResult).toBeTruthy();
     });
 
     it('should return match result with many inputs', () => {

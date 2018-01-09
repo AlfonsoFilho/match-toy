@@ -44,6 +44,10 @@ export const isType = (value: any, { typeOf }: any) => {
     return isNullable(value);
   }
 
+  if (typeOf === 'NaN') {
+    return Number.isNaN(value);
+  }
+
   if (contains(typeOf, ['String', 'Number', 'Boolean', 'Array', 'Object', 'Function', 'Null', 'Undefined'])) {
     return is(value, typeOf);
   }

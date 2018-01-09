@@ -56,6 +56,12 @@ describe('Interpreter', () => {
       expect(run('1, 2', [1, 2])).toEqual(SUCCESS);
     });
 
+    it('should match Nan', () => {
+      // case('NaN', () => 'code')
+      expect(run('NaN', [NaN])).toEqual(SUCCESS);
+      expect(run('NaN', [1])).toEqual(FAIL);
+    });
+
     it('should match booleans', () => {
       // case('true', () => 'code')
       expect(run('true', [true])).toEqual(SUCCESS);

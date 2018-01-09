@@ -195,13 +195,25 @@ word "word"
     }
 
 float "number"
-  = minus? digit '.'? digit?
+  = minus? digit '.'? digit? exp?
+  / plus? digit '.'? digit? exp?
+  / minus? 'Infinity'
+  / plus? 'Infinity'
 
 digit "digit"
   = [0-9]+
 
+e
+  = [eE]
+
+exp
+  = e (minus / plus)? digit
+
 minus
   = _ '-'
+
+plus
+  = _ '+'
 
 true
   = 'true'
@@ -227,6 +239,7 @@ type
   / 'Function'
   / 'RegExp'
   / 'Date'
+  / 'NaN'
   / instance
 
 DoubleStringCharacter

@@ -25,7 +25,7 @@ With Match-ish, you'll be able to do:
 - [Logical Pattern](#logical-or)
 - [As Pattern](#as)
 
-All this in about 7.3kb gzipped.
+All this in about 7.5kb gzipped.
 
 [Try it now](https://npm.runkit.com/match-ish), then check out how to [install](#install) and [use](#usage) it.
 
@@ -397,6 +397,7 @@ Supported types:
 .case('Object')    // {}
 .case('Function')  // () => {/*code*/}
 .case('RegExp')    // /a-z/
+.case('NaN')       // Nan
 .case('Date')      // new Date()
 
 // Nullable is a special type. Any empty object,
