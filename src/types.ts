@@ -6,7 +6,7 @@ export type MatchSucess = [ true, {[key: string]: any} ];
 export type MatchFail = [ false, {[key: string]: any} ];
 export type MatchResult = MatchSucess | MatchFail | [ boolean, {[key: string]: any} ];
 export type AnyFn = (...args: any[]) => any;
-export type BoolFn = (...args: any[]) => boolean;
+export type GuardFn = (...args: any[]) => boolean;
 
 // INTERFACES
 export interface Pattern {
@@ -41,8 +41,8 @@ export interface AstNode {
 
 export interface MatchItem {
   pattern: Pattern;
-  predicate?: AnyFn;
-  guard?: BoolFn;
+  predicate?: any;
+  guard?: GuardFn;
 }
 
 export enum AstType {

@@ -1,6 +1,6 @@
 import { compile } from './compiler';
 import { interpreter } from './interpreter';
-import { AnyFn, BoolFn, ErrorMessages, MatchItem } from './types';
+import { AnyFn, ErrorMessages, GuardFn, MatchItem } from './types';
 
 export class Matcher {
 
@@ -26,13 +26,13 @@ export class Matcher {
         return state;
       }
 
-      if (typeof predicate !== 'function') {
+      if (typeof predicate === 'undefined') {
         throw new Error(ErrorMessages.MISSING_PREDICATE);
       }
 
       const [ resultStatus, result ] = interpreter(pattern, value);
 
-      if (resultStatus !== false && guard(result) && typeof predicate === 'function') {
+      if (resultStatus !== false && guard(result)) {
         state.matchCallback = predicate;
         state.matchArgs = result;
         state.done = true;
@@ -42,7 +42,7 @@ export class Matcher {
     }, { matchCallback: this.elseValue, matchArgs: undefined as any, done: false });
 
     try {
-      return matchCallback(matchArgs);
+      return typeof matchCallback === 'function' ? matchCallback(matchArgs) : matchCallback;
     } catch (error) {
       try {
         return this.catchCallback(error);
@@ -52,21 +52,21 @@ export class Matcher {
     }
   }
 
-  public case(pattern: string, predicate?: AnyFn, guard?: BoolFn) {
+  public case(pattern: string, predicate?: any, guard?: GuardFn) {
     this.matchList.push({ pattern: compile(pattern), predicate, guard });
     return this;
   }
 
-  public with(pattern: string, predicate?: AnyFn, guard?: BoolFn) {
+  public with(pattern: string, predicate?: any, guard?: GuardFn) {
     return this.case(pattern, predicate, guard);
   }
 
-  public do(predicate: AnyFn): Matcher {
+  public do(predicate: any): Matcher {
     this.matchList[this.matchList.length - 1].predicate = predicate;
     return this;
   }
 
-  public when(func: BoolFn): Matcher {
+  public when(func: GuardFn): Matcher {
     const lastRule = this.matchList[this.matchList.length - 1];
     if (typeof lastRule.guard !== 'undefined') {
       throw new Error(ErrorMessages.ONE_GUARD_PER_PATTERN);
