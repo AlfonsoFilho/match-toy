@@ -161,6 +161,7 @@ object
 
 object_member
   = t:rest { return { bind: t.bind, value: t.value, rest: true } }
+  / alias:word '@' key:word _ ':' _ value:values { return { bind: key, value: value, alias }; }
   / key:word '@' _ ':' _ value:values { return { bind: key, value: value, alias: key }; }
   / key:word _ ':' _ value:values { return { bind: key, value: value }; }
   / bind:word { return { bind: bind, value: bind, binding: true } }

@@ -467,6 +467,8 @@ describe('Interpreter', () => {
       expect(run('{one@: 1}', [{one: 1}])).toEqual([true, { one: 1 }]);
       expect(run('{one: { two: { three@:3 } }}', [{one: { two: { three: 3 }}}])).toEqual([true, { three: 3 }]);
       expect(run('x@{one@: 1, two: 2}', [{ one: 1, two: 2 }])).toEqual([true, { x: {one: 1, two: 2}, one: 1 }]);
+      expect(run('x@{a@one: 1, two: 2}', [{ one: 1, two: 2 }])).toEqual([true, { x: {one: 1, two: 2}, a: 1 }]);
+      expect(run('x@{one@one: 1, two: 2}', [{ one: 1, two: 2 }])).toEqual([true, { x: {one: 1, two: 2}, one: 1 }]);
     });
 
     it('should bind alias on sequences', () => {
@@ -593,6 +595,4 @@ describe('Interpreter', () => {
       }).toThrowError(expect.stringMatching('Match-ish Syntax Error'));
     });
   });
-
-  // describe.skip('Doc Examples', () => {});
 });
