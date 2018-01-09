@@ -1,8 +1,6 @@
 
 const { match } = require('match-ish');
 
-const start = process.hrtime();
-
 const test = match()
   .with('1', () => 'one')
   .with('1, 2', () => 'one and two')
@@ -11,7 +9,3 @@ const test = match()
   .end();
 
 console.log(JSON.stringify(test(1, 2)))
-
-const end = process.hrtime(start);
-
-console.log(`time: ${end[0]} ${end[1]}`)
