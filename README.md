@@ -30,7 +30,7 @@ All this in about 7.3kb gzipped.
 [Try it now](https://npm.runkit.com/match-ish), then check out how to [install](#install) and [use](#usage) it.
 
 #### Interesting but...
-If do you think this looks like an overengineering `switch..case`, let's compare some code then you make your mind.
+If you think this looks like an overengineering `switch..case`, let's compare some code then you make your mind.
 
 Let's say, hypothetically, we have to create a function that extracts the name and the address of a user from an object then return a string with a human-friendly message. A kind of task very common on daily work.
 
@@ -123,7 +123,7 @@ Place the snippet into your html:
 ```html
 <script src="https://cdn.jsdelivr.net/npm/match-ish/dist/bundle/index.min.js"></script>
 ```
-For specific version append the desired version (on the format `@x.x.x`) before the word `match-ish` just like this:   `https://cdn.jsdelivr.net/npm/match-ish@1.0.0/dist/bundle/index.min.js`.
+For specific version append the desired version (on the format `@x.x.x`) before the word `match-ish` just like this:   `https://cdn.jsdelivr.net/npm/match-ish@2.0.0/dist/bundle/index.min.js`.
 
 This file is a bundle in the [UMD](https://github.com/umdjs/umd) format. In browser's environments, the module name is in camelcase and available on `window` scope.
 ```javascript
@@ -147,11 +147,11 @@ const convertOneToString = match()
 convertOneToString(1); // return 'one'
 convertOneToString(2); // return undefined
 
-// Create another one, but now since we are passing an
-// argument the matching runs immediately.
-const one = match(1)
+// Create another one, but now we only need
+// the value returned by the match
+const one = match()
   .case('1', () => 'one')
-  .end();
+  .return(1); // using `return()` match runs immediately
 
 one === 'one'; // true
 ```
@@ -168,11 +168,15 @@ const myFunc = match()
   
   // using es6 destructuring, things looks much better
   .case('2, y', ({ y }) => `Y is ${y}`) 
+
+  // you can use values as well
+  .case('0, 0', 'zero') 
   .end()
 
 myFunc(2, 1); // === 'X is 2'
 myFunc(1); // === 'one'
 myFunc(2, 3); // === 'Y is 3'
+myFunc(0, 0); // === 'zero'
 
 ```
 The first argument is a string under javascript point of view. But it is not a simple string. Actually, this is a [DSL](#dsl) with which we can express the pattern easier than using a complicated data or function structures.
@@ -192,7 +196,7 @@ myFunc(2); // === '2 is even'
 myFunc(3); // === '3 is odd'
 
 ```
-In this case, the pattern is exactly the same. But since there is guard defining a condition, `myFunc` returns different values.
+In this case, the pattern is exactly the same. But since there is guard defining a condition, `myFunc` returns different values. The guard function will receive the matched values, just like the `case()` callbacks.
 
 Only one guard per pattern is allowed:
 ```javascript
@@ -211,7 +215,7 @@ const myFunc = match()
 ```
 
 #### Do
-Alternatively, you can define the callback using the `do()`:
+Alternatively, you can define the pattern callback using the `do()`:
 ```javascript
 const myFunc = match()
   // Common (and recommended) syntax
@@ -280,17 +284,17 @@ You can achieve nesting matching by simply creating a new pattern match inside t
 ```javascript
 const myFunc = match()
   .case('0', () => 'is zero')
-  .case('_, x', ({x}) => match(x)
+  .case('_, x', ({x}) => match()
     .case('y', () => 'Y is even').when(({y}) => y % 2 === 0)
     .case('y', () => 'Y is odd')
-    .end())
+    .return(x))
   .end();
 
 myFunc(2, 2) // Y is even
 ```
 
 ### DSL
-So far, we covered how to use the library functions. Now, let talk about what makes Match-ish shines. As discussed above, the first argument of the `case()` function is not really a string. It is [Domain Specific Language](https://en.wikipedia.org/wiki/Domain-specific_language), designed to make patterns definitions easier.  [Other libraries](#other-nice-projects-and-initiatives) have different approaches like object schemas or extending the language with macros _(macros are great BTW)_. But for the sake of expressiveness and simplicity Match-ish use a really simple and straightforward declarative language. Right below, you'll find out everything you need to start using it.
+So far, we covered how to use the library functions. Now, let talk about what makes Match-ish shines. As discussed above, the first argument of the `case()` function is not really a string. It is [Domain Specific Language](https://en.wikipedia.org/wiki/Domain-specific_language), designed to make patterns definitions easier.  [Other libraries](#other-nice-projects-and-initiatives) have different approaches like object schemas or extending the language with macros _(macros are great BTW)_. But for the sake of expressiveness and simplicity Match-ish use a really powerful and straightforward declarative language. Right below, you'll find out everything you need to start using it.
 
 #### Sequence of values
 All patterns expect a defined order and length. If a given input doesn't match either, the evaluation fails and go to the next pattern.
@@ -345,7 +349,7 @@ The bind pattern assigns the matched value to a variable.
 .case('{ a: 1, b: myvar')
 ```
 #### Wildcard
-This pattern will match anything, despite the value, then it is ignored. This is very useful for ignore unrelevant values inside a sequence or list. Another case is use wildcards as a final clause if none of the previous patterns matches.
+This pattern will match anything, despite the value, then it is ignored. This is very useful for ignore irrelevant values inside a sequence or list. Another case is use wildcards as a final clause if none of the previous patterns matches.
 ```javascript
 .case('_')      
 .case('_, 2')   
@@ -393,9 +397,10 @@ Supported types:
 .case('Object')    // {}
 .case('Function')  // () => {/*code*/}
 .case('RegExp')    // /a-z/
-.case('Date')    // new Date()
+.case('Date')      // new Date()
 
-// Nullable is a special type. 
+// Nullable is a special type. Any empty object,
+// empty array, empty string, zero, undefined or null.
 .case('Nullable')  // {}, [], '', 0, undefined, null
 ```
 
@@ -434,7 +439,10 @@ The rest pattern, is very similar to the rest operator of Javascript.
 // Again, split an array binding the first two values
 // but now, the rest of the list is ignored
 .case('[ first, second, ...]')
-.case('[ a, b, c, ...dtoy, z]') // Numbers
+
+// In this case, we capture the first the items and the last one.
+// Every thing else in the middle is binding to dtoy variable.
+.case('[ a, b, c, ...dtoy, z]')
 
 // Match an array with one or more items
 .case('[ ... ]')
@@ -444,7 +452,7 @@ The rest pattern, is very similar to the rest operator of Javascript.
 ```
 
 ### Mapping
-Mapping pattern allow us to define a pattern to be used over every item of an array or object. The is perfect when we need to filter and/or desconstruct a dataset. This is like an extension of the Rest pattern.
+Mapping pattern allow us to define a pattern to be used over every item of an array or object. The is perfect when we need to filter and/or deconstruct a dataset. This is like an extension of the Rest pattern.
 ```javascript
 const marvelCharacters = [
   { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
@@ -479,30 +487,90 @@ With the operator `|` you can combine multiple patterns in order to match one of
 ```javascript
 .case('2 | 4') // will match either 2 or 4
 .case('1, _ | 2, _ ')
-// Given 1, 2 match
-// Given 2, 8 match
-// Given 3, 1 not match
-// Given 3 not match
+// given (1, 2) then match
+// given (2, 8) then not match
+// given (3, 1) then not match
+// given (3) then not match
 ```
 #### Logical And
 With the operator `&` you can combine multiple patterns in order to match all of them.
 ```javascript
-// should match the input 2, 4 and bind 2 to the variabel `x`
+// should match the input 2, 4 and bind 2 to the variable `x`
 .case('2, x & _, 4')
 ```
 #### As
-Capture all the bound values then assign them to another variable.
+The As pattern is tool to define alias for literals and groups.
 ```javascript
-// Given { 1, 2, 3 } then { x: 1, y: 2, z: 3, all: {x: 1, y: 2, z: 3} }
-.case('x, y, z as all')        // Numbers
+
+// Using with literals
+.case('1, x@2, 3', ({ x }) => x === 2)
+.case('200, resp@true', ({ resp }) => resp === true)
+
+// Using with groups
+.case('firstTwo@(1, 2), 3, 4', ({ firstTwo }) => firstTwo === [ 1, 2 ])
+
+.case('all@(x, y, z)', ({ x, y, z, all }) => { 
+  assert(x === 1)
+  assert(y === 'two')
+  assert(z === true)
+  assert(all === [ 1, 'two', true ])
+})  
+
+.case('all@("one", x@"two")', ({ all, x }) => { 
+  assert(all === ['one', 'two']);
+  assert(x === 'two');
+ })
+
+// Using with lists
+.case('list@[1, 2, 3]', ({ list }) => assert(list === [1, 2, 3]))
+
+.case('list@[1, 2, last@3]', ({list, last}) => {
+  assert(list === [1, 2, 3]);
+  assert(last === 3);
+})
+
+// Using with objects
+.case('hash@{ one: 1, two: 2 }', ({ hash }) => {
+  assert(hash === { one: 1, two: 2 });
+})
+
+.case('hash@{ a@one: 1, b@two: 2 }', ({ hash, a, b }) => {
+  assert(hash === { one: 1, two: 2 })
+  assert(a === 1)
+  assert(b === 2)
+})
+
+// You can reuse the key name for the alias with
+// this syntax variation
+.case('hash@{ one@: 1, two@: 2 }', ({ hash, one, two }) => {
+  assert(hash === { one: 1, two: 2 })
+  assert(one === 1)
+  assert(two === 2)
+})
+
+// Using with mapping patterns 
+.case('[...heroes{ name, type@: "hero", publisher@: String }]')
+/* given ([ 
+  { id: 0, name: 'Clark Kent', type: 'hero', publisher: 'DC' }
+  { id: 1, name: 'Lex Luthor', type: 'villain', publisher: 'DC' }
+  { id: 2, name: 'Luke Cage', type: 'hero', publisher: 'Marvel' }
+ ]) then
+   heroes: [
+    { name: 'Clark Kent', type: 'hero', publisher: 'DC' }
+    { name: 'Lex Luthor', type: 'villain', publisher: 'DC' }
+    { name: 'Luke Cage', type: 'hero', publisher: 'Marvel' }
+   ]
+ }
+*/
+
 ```
 
 ### API
 #### `match(...value?: any): any | function`
 Start pattern match definition. If one or more arguments are passed `match()` will return the result of the matching. Otherwise, the return will be a function.
-#### `case(pattern: string, callback?: function, guard?: function)`
-Define a patten. Optionaly can set the callback and a guard.
-#### `with(pattern: string, callback?: function, guard?: function)`
+#### `case(pattern: string, callback?: function | any, guard?: function)`
+Define a patten. Optionaly can set the callback and a guard. If suits better, you can pass a value to be returned instead of a function for the callback parameter.
+#### `with(pattern: string, callback?: function | any, guard?: function)`
 Alias for `case()`.
 #### `when((...input?: any) => boolean)`
 Define a guard. Receive a function as an argument. This function will receive the sequence of input, then should return a boolean value. For example, if the input is `match(1, 2, 3)`, a valid guard must be `(a, b, c) => a > b > c`.
@@ -514,6 +582,8 @@ Define a callback if no pattern maches
 Define a callback if exception is throwed from callbacks
 #### `end()`
 Finish pattern match declaration chain.
+#### `return(...value: any)`
+Finish pattern match declaration and return the match value.
 
 ## Development
 
