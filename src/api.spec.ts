@@ -61,6 +61,22 @@ describe('API', () => {
 
       expect(matchResult).toBeUndefined();
     });
+
+    it('should return value', () => {
+      const matchResult = match()
+        .case('1', 'one')
+        .return(1);
+
+      expect(matchResult).toEqual('one');
+    });
+
+    it('should return value', () => {
+      const matchResult = match()
+        .case('1', true)
+        .return(1);
+
+      expect(matchResult).toEqual(true);
+    });
   });
 
   describe('basic match function', () => {
@@ -230,9 +246,20 @@ describe('API', () => {
           return 'Custom message';
         })
         .end();
-
       expect(isOneOrTwo(true)).toEqual(expect.stringMatching(/^Custom message/));
       expect(cb).toHaveBeenCalled();
+    });
+
+    it('should use else when nothing matches', () => {
+      const isOneOrTwo = match()
+        .case('true', () => JSON.parse('wrong json syntax'))
+        .catch((e) => {
+          // tslint:disable-next-line:no-string-throw
+          throw 'call default error message';
+        })
+        .end();
+
+      expect(isOneOrTwo(true)).toEqual(expect.stringMatching(/^Match error: call default error message/));
     });
   });
 
