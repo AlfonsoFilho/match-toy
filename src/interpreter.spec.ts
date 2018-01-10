@@ -588,7 +588,7 @@ describe('Interpreter', () => {
     it('should throw a error with a friendly message', () => {
       expect(() => {
         compile('1x');
-      }).toThrowError(expect.stringMatching('Match-ish Syntax Error'));
+      }).toThrowError(/Match-ish Syntax Error/);
     });
   });
 });
