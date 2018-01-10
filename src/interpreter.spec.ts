@@ -1,10 +1,10 @@
+import { gen, sample, sampleOne } from 'testcheck';
 import { compile } from './compiler';
 import { FAIL, SUCCESS  } from './constants';
 import { interpreter } from './interpreter';
 import { AstType } from './types';
 
 declare let check;
-declare let gen;
 
 // tslint:disable-next-line:no-var-requires
 require('jasmine-check').install();
@@ -36,7 +36,7 @@ describe('Interpreter', () => {
       expect(run('1', [1])).toEqual(SUCCESS);
     });
 
-    it('should fail if number is equal', () => {
+    it('should fail if number is not equal', () => {
       // case('1', () => 'code')
       expect(run('1', [2])).toEqual(FAIL);
     });
@@ -56,10 +56,21 @@ describe('Interpreter', () => {
       expect(run('1, 2', [1, 2])).toEqual(SUCCESS);
     });
 
-    it('should match Nan', () => {
+    it('should match NaN', () => {
       // case('NaN', () => 'code')
       expect(run('NaN', [NaN])).toEqual(SUCCESS);
       expect(run('NaN', [1])).toEqual(FAIL);
+    });
+
+    it('should match Infinity', () => {
+      // case('Infinity', () => 'code')
+      expect(run('Infinity', [Infinity])).toEqual(SUCCESS);
+      expect(run('Infinity', [1])).toEqual(FAIL);
+    });
+
+    check.it('should match a random sort of number patterns', gen.array(gen.number).notEmpty(), (x) => {
+      const pattern = x.join(', ');
+      expect(run(pattern, x)).toEqual(SUCCESS);
     });
 
     it('should match booleans', () => {
@@ -73,6 +84,7 @@ describe('Interpreter', () => {
     it('should match string with single quotes', () => {
       // case('"text"', () => 'code')
       expect(run('"text"', ['text'])).toEqual(SUCCESS);
+      expect(run('""', [''])).toEqual(SUCCESS);
       expect(run('"wrong"', ['text'])).toEqual(FAIL);
     });
 
@@ -126,28 +138,6 @@ describe('Interpreter', () => {
       expect(
         run('["a", [ { b: "true", c: { d: false }}], 0], "text"',
         [['a', [ { b: 'true', c: { d: false }}], 0], 'text'])).toEqual(SUCCESS);
-    });
-
-    describe('QuickCheck', () => {
-      check.it('should match only the same value', gen.int, (x) => {
-        if (x === 1) {
-          expect(run('1', [x])).toEqual(SUCCESS);
-        } else {
-          expect(run('1', [x])).toEqual(FAIL);
-        }
-      });
-
-      check.it.skip('should match strings', gen.asciiString, (str) => {
-        console.log(str);
-        const pattern = `"${str}"`;
-        if (['"""', '""""', '"\\"', '"" "', '""!"', '" ""', '"\\ "', '"!""', '"\\!"'].includes(pattern)) {
-          expect(() => {
-            run(pattern, [str]);
-          }).toThrowError();
-        } else {
-          expect(run(pattern, [str])).toEqual(SUCCESS);
-        }
-      });
     });
   });
 
