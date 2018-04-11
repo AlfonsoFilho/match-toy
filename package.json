@@ -38,26 +38,26 @@
   "author": "Alfonso Filho <alfonsocfilho@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "22.0.1",
-    "@types/node": "8.5.8",
+    "@types/jest": "22.2.3",
+    "@types/node": "9.6.4",
     "jasmine-check": "1.0.0-rc.0",
-    "jest": "22.0.4",
-    "jest-cli": "22.0.4",
+    "jest": "22.4.3",
+    "jest-cli": "22.4.3",
     "npm-run-all": "4.1.2",
     "pegjs": "0.10.0",
     "rimraf": "2.6.2",
-    "rollup": "0.53.3",
-    "rollup-plugin-commonjs": "8.2.6",
+    "rollup": "0.57.1",
+    "rollup-plugin-commonjs": "9.1.0",
     "rollup-plugin-filesize": "1.5.0",
-    "rollup-plugin-node-resolve": "3.0.0",
+    "rollup-plugin-node-resolve": "3.3.0",
     "rollup-plugin-typescript": "0.8.1",
-    "rollup-plugin-uglify": "2.0.1",
-    "standard-version": "4.2.0",
-    "ts-jest": "22.0.1",
+    "rollup-plugin-uglify": "3.0.0",
+    "standard-version": "4.3.0",
+    "ts-jest": "22.4.2",
     "ts-pegjs": "0.1.13",
-    "tslint": "5.8.0",
-    "tslint-eslint-rules": "4.1.1",
-    "typescript": "2.6.2"
+    "tslint": "5.9.1",
+    "tslint-eslint-rules": "5.1.0",
+    "typescript": "2.8.1"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -84,8 +84,7 @@
       "!**/*.d.ts",
       "!src/index.ts",
       "!src/types.ts"
-    ],
-    "mapCoverage": true,
+    ],    
     "coverageThreshold": {
       "global": {
         "branches": 90,
