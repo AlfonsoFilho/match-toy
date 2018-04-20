@@ -1,5 +1,5 @@
 
-const { match } = require('match-ish');
+const { match } = require('match-toy');
 
 const test = match()
   .with('1', () => 'one')

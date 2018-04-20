@@ -1,19 +1,19 @@
-# Match-ish
+# Match-toy
 
 
-[![Build Status](https://travis-ci.org/AlfonsoFilho/match-ish.svg?branch=master)](https://travis-ci.org/AlfonsoFilho/match-ish)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/7ab1573ab933cb598594/test_coverage)](https://codeclimate.com/github/AlfonsoFilho/match-ish/test_coverage)
-[![Greenkeeper badge](https://badges.greenkeeper.io/AlfonsoFilho/match-ish.svg)](https://greenkeeper.io/)
-[![npm version](https://badge.fury.io/js/match-ish.svg)](https://badge.fury.io/js/match-ish)
-[![Try match-ish on RunKit](https://badge.runkitcdn.com/match-ish.svg)](https://npm.runkit.com/match-ish)
+[![Build Status](https://travis-ci.org/match-toy/match-toy.svg?branch=master)](https://travis-ci.org/match-toy/match-toy)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/b4ef038eea888a8a8cfb/test_coverage)](https://codeclimate.com/github/match-toy/match-toy/test_coverage)
+[![Greenkeeper badge](https://badges.greenkeeper.io/match-toy/match-toy.svg)](https://greenkeeper.io/)
+[![npm version](https://badge.fury.io/js/match-toy.svg)](https://badge.fury.io/js/match-toy)
+[![Try match-toy on RunKit](https://badge.runkitcdn.com/match-toy.svg)](https://npm.runkit.com/match-toy)
 > The pattern matching library for javascript.
 
 ## What is it?
-Match-ish is a pattern matching library for JavaScript. [Pattern matching](https://en.wikipedia.org/wiki/Pattern_matching) is a way to check a sequence of a given input against one or more specific patterns. Many languages like Elixir/Erlang, Rust, F#, Elm, Haskell or Scala have this as a built-in feature.
+Match-toy is a pattern matching library for JavaScript. [Pattern matching](https://en.wikipedia.org/wiki/Pattern_matching) is a way to check a sequence of a given input against one or more specific patterns. Many languages like Elixir/Erlang, Rust, F#, Elm, Haskell or Scala have this as a built-in feature.
 
-Pattern matching is a very powerful concept and Match-ish is an attempt to bring this to javascript with an elegant and familiar syntax (jQuery-like chains) plus a simple [domain specific language](#dsl).
+Pattern matching is a very powerful concept and Match-toy is an attempt to bring this to javascript with an elegant and familiar syntax (jQuery-like chains) plus a simple [domain specific language](#dsl).
 
-With Match-ish, you'll be able to do:
+With Match-toy, you'll be able to do:
 - [Literal Pattern](#literal)
 - [Bind Pattern](#bind)
 - [Typed Pattern](#typed)
@@ -27,7 +27,7 @@ With Match-ish, you'll be able to do:
 
 All this in about 7.5kb gzipped.
 
-[Try it now](https://npm.runkit.com/match-ish), then check out how to [install](#install) and [use](#usage) it.
+[Try it now](https://npm.runkit.com/match-toy), then check out how to [install](#install) and [use](#usage) it.
 
 #### Interesting but...
 If you think this looks like an overengineering `switch..case`, let's compare some code then you make your mind.
@@ -74,10 +74,10 @@ console.log(getUserResponse(/* user data from server maybe... */))
 
 // About 33 lines of code
 ```
-What if we do the same with Match-ish:
+What if we do the same with Match-toy:
 ```javascript
-// Using match-ish
-import { match } from 'match-ish'
+// Using match-toy
+import { match } from 'match-toy'
 
 const getUserResponse = match()
   .case('{ status: 200, user: { name:String, ...address } }', ({name, address}) => 
@@ -105,29 +105,29 @@ A good way to learn is by example. So the best kick off is [read the tests](./sr
 
 #### From NPM
 ```sh
-$ npm install match-ish --save
+$ npm install match-toy --save
 ```
 Or yarn:
 ```sh
-$ yarn add match-ish
+$ yarn add match-toy
 ```
 Then import/require the module.
 ```javascript
-const { match } = require('match-ish');
+const { match } = require('match-toy');
 // or
-import { match } from 'match-ish';
+import { match } from 'match-toy';
 ```
 
 #### From CDN
 Place the snippet into your html:
 ```html
-<script src="https://cdn.jsdelivr.net/npm/match-ish/dist/bundle/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/match-toy/dist/bundle/index.min.js"></script>
 ```
-For specific version append the desired version (on the format `@x.x.x`) before the word `match-ish` just like this:   `https://cdn.jsdelivr.net/npm/match-ish@2.0.0/dist/bundle/index.min.js`.
+For specific version append the desired version (on the format `@x.x.x`) before the word `match-toy` just like this:   `https://cdn.jsdelivr.net/npm/match-toy@2.0.0/dist/bundle/index.min.js`.
 
 This file is a bundle in the [UMD](https://github.com/umdjs/umd) format. In browser's environments, the module name is in camelcase and available on `window` scope.
 ```javascript
-var myFunc = matchIsh.match()
+var myFunc = matchToy.match()
                       .case('1', () => 'one')
                       .end()
 ```
@@ -137,7 +137,7 @@ See more in [examples](./examples).
 ### Usage
 Most basic usage:
 ```javascript
-import { match } from 'match-ish';
+import { match } from 'match-toy';
 
 // Create a new pattern matching function
 const convertOneToString = match()
@@ -294,7 +294,7 @@ myFunc(2, 2) // Y is even
 ```
 
 ### DSL
-So far, we covered how to use the library functions. Now, let talk about what makes Match-ish shines. As discussed above, the first argument of the `case()` function is not really a string. It is [Domain Specific Language](https://en.wikipedia.org/wiki/Domain-specific_language), designed to make patterns definitions easier.  [Other libraries](#other-nice-projects-and-initiatives) have different approaches like object schemas or extending the language with macros _(macros are great BTW)_. But for the sake of expressiveness and simplicity Match-ish use a really powerful and straightforward declarative language. Right below, you'll find out everything you need to start using it.
+So far, we covered how to use the library functions. Now, let talk about what makes Match-toy shines. As discussed above, the first argument of the `case()` function is not really a string. It is [Domain Specific Language](https://en.wikipedia.org/wiki/Domain-specific_language), designed to make patterns definitions easier.  [Other libraries](#other-nice-projects-and-initiatives) have different approaches like object schemas or extending the language with macros _(macros are great BTW)_. But for the sake of expressiveness and simplicity Match-toy use a really powerful and straightforward declarative language. Right below, you'll find out everything you need to start using it.
 
 #### Sequence of values
 All patterns expect a defined order and length. If a given input doesn't match either, the evaluation fails and go to the next pattern.

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { render } from 'react-dom';
-import { match } from 'match-ish';
+import { match } from 'match-toy';
 
 const isWinner = (player, matrix) => {
 

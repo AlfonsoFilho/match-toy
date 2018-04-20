@@ -30,7 +30,7 @@ export const compile = (source: string, _parse: ParseFunction = parse): Pattern 
   try {
     return (_parse(source, {}) as Pattern);
   } catch (error) {
-    throw new Error(`Match-ish Syntax Error:
+    throw new Error(`Match-toy Syntax Error:
 ${source}
 ${makeCaret(source, error.location)}
 

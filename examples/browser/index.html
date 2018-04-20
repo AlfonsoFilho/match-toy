@@ -13,7 +13,7 @@
   <hr>
   <button id="calculate" name="calculate">What is my size?</button>
 
-  <script src="https://cdn.jsdelivr.net/npm/match-ish/dist/bundle/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/match-toy/dist/bundle/index.min.js"></script>
   <script>
     var input = document.getElementById('cm');
     var result = document.getElementById('result');
@@ -22,7 +22,7 @@
       return function() { return str };
     }
 
-    var getSize = matchIsh.match()
+    var getSize = matchToy.match()
       .with('0..48', print('S'))
       .with('49..52', print('M'))
       .with('53..56', print('L'))

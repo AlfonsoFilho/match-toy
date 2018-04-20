@@ -1,4 +1,4 @@
-import { match } from 'match-ish';
+import { match } from 'match-toy';
 
 /*
 // Original code
@@ -26,7 +26,7 @@ const todos = (state = [], action) => {
 }
 */
 
-// Refactored using Match-ish
+// Refactored using Match-toy
 const todos = match()
   .with('state, { type: "ADD_TODO", id, text }', ({state = [], id, text}) => [ ...state, { id, text, completed: false }])
   .with('state, { type: "TOGGLE_TODO", id }', ({state = [], id }) => state.map(todo =>
