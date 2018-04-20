@@ -1,0 +1,12 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "examples/node/package.json",
+        "examples/redux/package.json",
+        "examples/tic-tac-toe/package.json",
+        "package.json"
+      ]
+    }
+  }
+}
