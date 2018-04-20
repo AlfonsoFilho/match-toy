@@ -1,5 +1,6 @@
 **/*.gen.js
 **/*.gen.ts
+.vscode/
 
 # Created by https://www.gitignore.io/api/vim,osx,node,linux,emacs,eclipse,windows,intellij,sublimetext,visualstudio,visualstudiocode
 
