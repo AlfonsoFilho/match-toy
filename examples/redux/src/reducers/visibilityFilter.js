@@ -1,4 +1,4 @@
-import { match } from 'match-ish';
+import { match } from 'match-toy';
 
 /*
 // Original code
@@ -12,7 +12,7 @@ const visibilityFilter = (state = 'SHOW_ALL', action) => {
 }
 */
 
-// Refactored using Match-ish
+// Refactored using Match-toy
 const visibilityFilter = match()
   .with('state, { type: "SET_VISIBILITY_FILTER", filter }', ({filter}) => filter)
   .with('state, _', ({state = 'SHOW_ALL'}) => state)

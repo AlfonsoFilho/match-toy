@@ -31,7 +31,7 @@ describe('Compiler', () => {
 
     expect(() => {
       compile('x, ?', parse);
-    }).toThrowError(`Match-ish Syntax Error:
+    }).toThrowError(`Match-toy Syntax Error:
 x, ?
    ^
 
@@ -49,7 +49,7 @@ Found \`?\`, but expected one of:
 
     expect(() => {
       compile('x, ?', parse);
-    }).toThrowError(`Match-ish Syntax Error:
+    }).toThrowError(`Match-toy Syntax Error:
 x, ?
    ^
 
@@ -67,7 +67,7 @@ it('should handle text error', () => {
 
   expect(() => {
     compile('x, ?', parse);
-  }).toThrowError(`Match-ish Syntax Error:
+  }).toThrowError(`Match-toy Syntax Error:
 x, ?
 ^^^^
 

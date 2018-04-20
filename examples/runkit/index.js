@@ -1,4 +1,4 @@
-const { match } = require("match-ish");
+const { match } = require("match-toy");
 
 const factorial = match()
   .with('0', () => 1)

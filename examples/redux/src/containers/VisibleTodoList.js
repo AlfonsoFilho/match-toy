@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import { toggleTodo } from '../actions'
 import TodoList from '../components/TodoList'
-import { match } from 'match-ish';
+import { match } from 'match-toy';
 
 /*
 // Original code
@@ -19,7 +19,7 @@ const getVisibleTodos = (todos, filter) => {
 }
 */
 
-// Refactored using Match-ish
+// Refactored using Match-toy
 const getVisibleTodos = match()
   .with('todos, "SHOW_ALL"', ({todos}) => todos)
   .with('[...todos({ completed@: true, id, text })], "SHOW_COMPLETED"', ({todos}) => todos)
