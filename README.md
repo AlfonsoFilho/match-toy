@@ -69,6 +69,7 @@ const one = match()
 
 one === 'one'; // true
 ```
+See more about [usage](https://github.com/match-toy/match-toy/wiki/Usage) in depth.
 
 ### Built with
 - [PEG.js](https://pegjs.org/)
