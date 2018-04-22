@@ -1,4 +1,4 @@
-# ![Match-Toy](https://match-toy.github.io/assets/match-toy-logo.svg)
+# [![Match-Toy](https://match-toy.github.io/assets/match-toy-logo.svg)](https://match-toy.github.io)
 
 
 
