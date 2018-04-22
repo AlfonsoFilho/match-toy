@@ -1,4 +1,5 @@
-# Match-Toy
+# ![Match-Toy](https://match-toy.github.io/assets/match-toy-logo.svg)
+
 
 
 [![Build Status](https://travis-ci.org/match-toy/match-toy.svg?branch=master)](https://travis-ci.org/match-toy/match-toy)
@@ -7,8 +8,6 @@
 [![npm version](https://badge.fury.io/js/match-toy.svg)](https://badge.fury.io/js/match-toy)
 [![Try match-toy on RunKit](https://badge.runkitcdn.com/match-toy.svg)](https://npm.runkit.com/match-toy)
 > The pattern matching library for javascript.
-
-![Match-Toy](https://match-toy.github.io/assets/match-toy-logo.svg)
 
 [Match-Toy](https://match-toy.github.io) is a pattern matching library for javascript with a powerful DSL and support for a wide range of patterns. The best kick off is [read the tests](./src), there are tons of them covering all the cases. For complete documentation, please check out the [wiki](https://github.com/match-toy/match-toy/wiki). Another way is by examples:
 - [Tic-tac-toe](https://match-toy.github.io/tic-tac-toe)
