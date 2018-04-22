@@ -5,7 +5,8 @@
   "keywords": [
     "pattern-matching",
     "functional",
-    "pattern"
+    "pattern",
+    "tc-39"
   ],
   "main": "./dist/es5/index.js",
   "jsnext:main": "./dist/es6/index.js",
@@ -29,6 +30,7 @@
     "release": "standard-version",
     "prepare": "run-s ci"
   },
+  "homepage": "https://match-toy.github.io/",
   "repository": "github:match-toy/match-toy",
   "bugs": "https://github.com/match-toy/match-toy/issues",
   "files": [
