@@ -1,5 +1,5 @@
-import { match } from './api';
-import { ErrorMessages } from './types';
+import { match } from '../api';
+import { ErrorMessages } from '../types';
 
 declare let check;
 declare let gen;

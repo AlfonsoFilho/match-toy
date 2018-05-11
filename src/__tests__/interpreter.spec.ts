@@ -1,8 +1,8 @@
 import { gen, sample, sampleOne } from 'testcheck';
-import { compile } from './compiler';
-import { FAIL, SUCCESS  } from './constants';
-import { interpreter } from './interpreter';
-import { AstType } from './types';
+import { compile } from '../compiler';
+import { FAIL, SUCCESS  } from '../constants';
+import { interpreter } from '../interpreter';
+import { AstType } from '../types';
 
 declare let check;
 
