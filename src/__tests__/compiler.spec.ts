@@ -1,4 +1,4 @@
-import { compile } from './compiler';
+import { compile } from '../compiler';
 
 const makeParserError = ([offsetStart, offsetEnd], found, expected) => {
   return {

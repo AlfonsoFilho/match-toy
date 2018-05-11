@@ -1,4 +1,4 @@
-import { contains, is, reverse } from './helpers';
+import { contains, is, reverse } from '../helpers';
 
 describe('Helpers', () => {
 
