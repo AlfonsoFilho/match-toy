@@ -1,107 +1,84 @@
 import { compile } from './compiler';
 import { interpreter } from './interpreter';
-import { AnyFn, ErrorMessages, GuardFn, MatchItem } from './types';
+import { ErrorMessages } from './types';
 
-export class Matcher {
+const defaultCatchFn = (e: Error) => `Match error: ${e}`;
+const defaultGuardFn = () => true;
 
-  private initialValues: any;
-  private matchList: MatchItem[];
-  private elseValue: AnyFn;
-  private catchCallback: any;
+function makeMatchFunc(casesList: any[], elseFn, catchFn) {
+  return (...values) => {
 
-  constructor(value?: any[]) {
-    this.initialValues = value;
-    this.matchList = [];
-    this.elseValue = () => undefined;
-    this.catchCallback = this.defaultCatchCallback;
-  }
-
-  private defaultCatchCallback = (e: Error) => `Match error: ${e}`;
-
-  private runMatch(value: any[]): any {
-
-    const { matchCallback, matchArgs } = this.matchList.reduce((state, {pattern, predicate, guard = () => true}) => {
-
+    const { matchedFn, matchedArgs } = casesList.reduce((state, { pattern, predicate, guard = defaultGuardFn }) => {
       if (state.done) {
         return state;
       }
 
-      if (typeof predicate === 'undefined') {
-        throw new Error(ErrorMessages.MISSING_PREDICATE);
-      }
+      const [status, result] = interpreter(pattern, values);
 
-      const [ resultStatus, result ] = interpreter(pattern, value);
-
-      if (resultStatus !== false && guard(result)) {
-        state.matchCallback = predicate;
-        state.matchArgs = result;
+      if (status !== false && guard(result)) {
+        state.matchedFn = predicate;
+        state.matchedArgs = result;
         state.done = true;
       }
 
       return state;
-    }, { matchCallback: this.elseValue, matchArgs: undefined as any, done: false });
+    }, { matchedFn: elseFn, matchedArgs: undefined, done: false });
 
     try {
-      return typeof matchCallback === 'function' ? matchCallback(matchArgs) : matchCallback;
+      return typeof matchedFn === 'function'
+        ? matchedFn(matchedArgs)
+        : matchedFn;
     } catch (error) {
       try {
-        return this.catchCallback(error);
+        return catchFn(error);
       } catch (error) {
-        return this.defaultCatchCallback(error);
+        return defaultCatchFn(error);
       }
     }
-  }
-
-  public case(pattern: string, predicate?: any, guard?: GuardFn) {
-    this.matchList.push({ pattern: compile(pattern), predicate, guard });
-    return this;
-  }
-
-  public with(pattern: string, predicate?: any, guard?: GuardFn) {
-    return this.case(pattern, predicate, guard);
-  }
-
-  public do(predicate: any): Matcher {
-    this.matchList[this.matchList.length - 1].predicate = predicate;
-    return this;
-  }
-
-  public when(func: GuardFn): Matcher {
-    const lastRule = this.matchList[this.matchList.length - 1];
-    if (typeof lastRule.guard !== 'undefined') {
-      throw new Error(ErrorMessages.ONE_GUARD_PER_PATTERN);
-    }
-    lastRule.guard = func;
-    return this;
-  }
-
-  public else(func: AnyFn): Matcher {
-    this.elseValue = func;
-    return this;
-  }
-
-  public catch(func: AnyFn): Matcher {
-    this.catchCallback = func;
-    return this;
-  }
-
-  public return(...value: any[]) {
-    this.initialValues = value;
-    return this.runMatch(this.initialValues);
-  }
-
-  public end()  {
-    if (this.matchList.length === 0) {
-      throw new Error(ErrorMessages.NO_PATTERN_DEFINED);
-    }
-
-    if (this.initialValues.length > 0) {
-      return this.runMatch(this.initialValues);
-    }
-
-    return (...value: any[]) => this.runMatch(value);
-  }
+  };
 }
 
-export const match = (...args: any[]) => new Matcher(args);
+function apiFactory() {
+
+  let casesList = [];
+  let elseFn = () => undefined;
+  let catchFn = defaultCatchFn;
+
+  return {
+    case(pattern: string, predicate, guard?: any) {
+      casesList.push({ pattern: compile(pattern), predicate, guard });
+      return this;
+    },
+    when(fn) {
+      const lastCase = casesList[casesList.length - 1];
+      if (typeof lastCase.guard !== 'undefined') {
+        throw new Error(ErrorMessages.ONE_GUARD_PER_PATTERN);
+      }
+      lastCase.guard = fn;
+      return this;
+    },
+    else(fn) {
+      elseFn = fn;
+      return this;
+    },
+    catch(fn) {
+      catchFn = fn;
+      return this;
+    },
+    end() {
+      if (casesList.length === 0) {
+        throw new Error(ErrorMessages.NO_PATTERN_DEFINED);
+      }
+      const matchFn = makeMatchFunc([...casesList], elseFn, catchFn);
+      casesList = [];
+      return matchFn;
+    },
+    return(...values) {
+      return this.end()(...values);
+    }
+  };
+}
+
+export const match = apiFactory();
+
 export default match;
