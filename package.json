@@ -28,7 +28,7 @@
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watchAll",
     "release": "standard-version",
-    "prepare": "run-s ci"
+    "benchmark": "node ./benchmarks/index.js"
   },
   "homepage": "https://match-toy.github.io/",
   "repository": "github:match-toy/match-toy",
@@ -40,8 +40,10 @@
   "author": "Alfonso Filho <alfonsocfilho@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "22.2.3",
-    "@types/node": "9.6.6",
+    "@types/jest": "22.x.x",
+    "@types/node": "10.x.x",
+    "beautify-benchmark": "0.2.4",
+    "benchmark": "2.1.4",
     "jasmine-check": "1.0.0-rc.0",
     "jest": "22.4.3",
     "jest-cli": "22.4.3",
