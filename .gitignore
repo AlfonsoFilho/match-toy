@@ -1,6 +1,14 @@
 **/*.gen.js
 **/*.gen.ts
+**/*.bs.js
+**/*.bs.ts
 .vscode/
+.DS_Store
+.merlin
+.bsb.lock
+npm-debug.log
+/lib/bs/
+/node_modules/
 
 # Created by https://www.gitignore.io/api/vim,osx,node,linux,emacs,eclipse,windows,intellij,sublimetext,visualstudio,visualstudiocode
 
