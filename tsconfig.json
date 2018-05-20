@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-
     "target": "es5",
     "module": "commonjs",
     "lib": [
@@ -14,17 +13,14 @@
     "noImplicitAny": false,
     "strictNullChecks": false,
     "noImplicitThis": true,
-    "alwaysStrict": true,    
+    "alwaysStrict": true,
     "downlevelIteration": true,
-    "allowJs": false,
-
+    "allowJs": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-
     "sourceMap": true,
-
     "types": [
       "node"
     ],
