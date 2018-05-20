@@ -13,9 +13,9 @@ const visibilityFilter = (state = 'SHOW_ALL', action) => {
 */
 
 // Refactored using Match-toy
-const visibilityFilter = match()
-  .with('state, { type: "SET_VISIBILITY_FILTER", filter }', ({filter}) => filter)
-  .with('state, _', ({state = 'SHOW_ALL'}) => state)
+const visibilityFilter = match
+  .case('state, { type: "SET_VISIBILITY_FILTER", filter }', ({ filter }) => filter)
+  .case('state, _', ({ state = 'SHOW_ALL' }) => state)
   .end()
 
 export default visibilityFilter

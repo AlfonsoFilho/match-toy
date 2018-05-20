@@ -27,13 +27,13 @@ const todos = (state = [], action) => {
 */
 
 // Refactored using Match-toy
-const todos = match()
-  .with('state, { type: "ADD_TODO", id, text }', ({state = [], id, text}) => [ ...state, { id, text, completed: false }])
-  .with('state, { type: "TOGGLE_TODO", id }', ({state = [], id }) => state.map(todo =>
-    (todo.id === id) 
-      ? {...todo, completed: !todo.completed}
+const todos = match
+  .case('state, { type: "ADD_TODO", id, text }', ({ state = [], id, text }) => [...state, { id, text, completed: false }])
+  .case('state, { type: "TOGGLE_TODO", id }', ({ state = [], id }) => state.map(todo =>
+    (todo.id === id)
+      ? { ...todo, completed: !todo.completed }
       : todo))
-  .with('state, _', ({state = []}) => state)
+  .case('state, _', ({ state = [] }) => state)
   .end()
 
 export default todos

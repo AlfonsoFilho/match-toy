@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>CDN Script example</title>
 </head>
+
 <body>
   <label for="cm">Chest Width(cm)</label>
   <input type="text" name="cm" id="cm" pattern="\d*" maxlength="2">
-  <label for="calculate">T-Shirt Size: <span id="result"></span></label>
+  <label for="calculate">T-Shirt Size:
+    <span id="result"></span>
+  </label>
   <hr>
   <button id="calculate" name="calculate">What is my size?</button>
 
@@ -18,24 +22,25 @@
     var input = document.getElementById('cm');
     var result = document.getElementById('result');
     var button = document.getElementById('calculate');
-    var print = function(str) {
-      return function() { return str };
+    var print = function (str) {
+      return function () { return str };
     }
 
-    var getSize = matchToy.match()
-      .with('0..48', print('S'))
-      .with('49..52', print('M'))
-      .with('53..56', print('L'))
-      .with('57..61', print('XL'))
-      .with('_', print('XXL'))
+    var getSize = matchToy.match
+      .case('0..48', print('S'))
+      .case('49..52', print('M'))
+      .case('53..56', print('L'))
+      .case('57..61', print('XL'))
+      .case('_', print('XXL'))
       .end();
 
-    button.addEventListener('click', function(e) {
+    button.addEventListener('click', function (e) {
       var sizeCm = parseInt(input.value, 10);
       console.log('T-Shirt size: ', getSize(sizeCm));
       result.innerText = getSize(sizeCm);
     });
-    
+
   </script>
 </body>
+
 </html>

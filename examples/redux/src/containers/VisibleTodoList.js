@@ -20,11 +20,11 @@ const getVisibleTodos = (todos, filter) => {
 */
 
 // Refactored using Match-toy
-const getVisibleTodos = match()
-  .with('todos, "SHOW_ALL"', ({todos}) => todos)
-  .with('[...todos({ completed@: true, id, text })], "SHOW_COMPLETED"', ({todos}) => todos)
-  .with('[...todos({ completed@: false, id, text })], "SHOW_ACTIVE"', ({todos}) => todos)
-  .with('_, filter', ({filter}) => { 
+const getVisibleTodos = match
+  .case('todos, "SHOW_ALL"', ({ todos }) => todos)
+  .case('[...todos({ completed@: true, id, text })], "SHOW_COMPLETED"', ({ todos }) => todos)
+  .case('[...todos({ completed@: false, id, text })], "SHOW_ACTIVE"', ({ todos }) => todos)
+  .case('_, filter', ({ filter }) => {
     throw new Error('Unknown filter: ' + filter);
   })
   .catch((e) => {
