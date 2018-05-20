@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.0.0"></a>
+# [3.0.0](https://github.com/match-toy/match-toy/compare/v2.0.1...v3.0.0) (2018-05-20)
+
+
+### Features
+
+* **api:** api module refactored ([a0bc8a5](https://github.com/match-toy/match-toy/commit/a0bc8a5))
+
+
+### BREAKING CHANGES
+
+* **api:** - match global in now an object instead a function
+- dropped support for .do()
+- dropped support for .with()
+
 <a name="2.0.1"></a>
 ## [2.0.1](https://github.com/match-toy/match-toy/compare/v2.0.0...v2.0.1) (2018-04-20)
 
