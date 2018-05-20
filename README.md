@@ -41,7 +41,7 @@ For specific version append the desired version (on the format `@x.x.x`) before 
 
 This file is a bundle in the [UMD](https://github.com/umdjs/umd) format. In browser's environments, the module name is in camelcase and available on `window` scope.
 ```javascript
-var myFunc = matchToy.match()
+var myFunc = matchToy.match
                       .case('1', () => 'one')
                       .end()
 ```
@@ -54,7 +54,7 @@ Most basic usage:
 import { match } from 'match-toy';
 
 // Create a new pattern matching function
-const convertOneToString = match()
+const convertOneToString = match
   .case('1', () => 'one')
   .end();
 
@@ -63,7 +63,7 @@ convertOneToString(2); // return undefined
 
 // Create another one, but now we only need
 // the value returned by the match
-const one = match()
+const one = match
   .case('1', () => 'one')
   .return(1); // using `return()` match runs immediately
 
