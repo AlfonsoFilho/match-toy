@@ -1,6 +1,4 @@
-# [![Match-Toy](https://match-toy.github.io/assets/match-toy-logo.svg)](https://match-toy.github.io)
-
-
+# [Match-Toy](https://match-toy.github.io)
 
 [![Build Status](https://travis-ci.org/match-toy/match-toy.svg?branch=master)](https://travis-ci.org/match-toy/match-toy)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/b4ef038eea888a8a8cfb/test_coverage)](https://codeclimate.com/github/match-toy/match-toy/test_coverage)
