@@ -1,6 +1,6 @@
 {
   "name": "match-toy",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "The pattern matching library for javascript",
   "keywords": [
     "pattern-matching",
