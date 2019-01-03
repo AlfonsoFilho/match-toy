@@ -39,11 +39,11 @@
   "author": "Alfonso Filho <alfonsocfilho@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "22.x.x",
+    "@types/jest": "23.3.11",
     "@types/node": "10.x.x",
     "jasmine-check": "1.0.0-rc.0",
-    "jest": "22.4.3",
-    "jest-cli": "22.4.3",
+    "jest": "23.6.0",
+    "jest-cli": "23.6.0",
     "npm-run-all": "4.1.5",
     "pegjs": "0.10.0",
     "prettier": "1.15.3",
@@ -55,46 +55,11 @@
     "rollup-plugin-typescript": "0.8.1",
     "rollup-plugin-uglify": "3.0.0",
     "standard-version": "4.4.0",
-    "ts-jest": "22.4.6",
+    "ts-jest": "23.10.5",
     "ts-pegjs": "0.2.2",
     "tslint": "5.12.0",
     "tslint-eslint-rules": "5.4.0",
     "typescript": "3.2.2"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ],
-    "transform": {
-      "^.+\\.(ts|tsx)$": "ts-jest"
-    },
-    "testMatch": [
-      "**/*.spec.(ts|tsx|js)"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/examples/"
-    ],
-    "collectCoverageFrom": [
-      "**/*.ts",
-      "!**/*.gen.ts",
-      "!**/*.d.ts",
-      "!src/index.ts",
-      "!src/types.ts"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 90,
-        "functions": 90,
-        "lines": 90,
-        "statements": 90
-      }
-    }
   },
   "runkitExampleFilename": "examples/runkit/index.js"
 }
