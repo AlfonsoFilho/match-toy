@@ -59,7 +59,7 @@
     "ts-pegjs": "0.1.13",
     "tslint": "5.10.0",
     "tslint-eslint-rules": "5.2.0",
-    "typescript": "2.8.3"
+    "typescript": "3.2.2"
   },
   "jest": {
     "moduleFileExtensions": [
