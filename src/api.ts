@@ -7,27 +7,27 @@ const defaultGuardFn = () => true;
 
 function makeMatchFunc(casesList: any[], elseFn, catchFn) {
   return (...values) => {
+    const { matchedFn, matchedArgs } = casesList.reduce(
+      (state, { pattern, predicate, guard = defaultGuardFn }) => {
+        if (state.done) {
+          return state;
+        }
 
-    const { matchedFn, matchedArgs } = casesList.reduce((state, { pattern, predicate, guard = defaultGuardFn }) => {
-      if (state.done) {
+        const [status, result] = interpreter(pattern, values);
+
+        if (status !== false && guard(result)) {
+          state.matchedFn = predicate;
+          state.matchedArgs = result;
+          state.done = true;
+        }
+
         return state;
-      }
-
-      const [status, result] = interpreter(pattern, values);
-
-      if (status !== false && guard(result)) {
-        state.matchedFn = predicate;
-        state.matchedArgs = result;
-        state.done = true;
-      }
-
-      return state;
-    }, { matchedFn: elseFn, matchedArgs: undefined, done: false });
+      },
+      { matchedFn: elseFn, matchedArgs: undefined, done: false }
+    );
 
     try {
-      return typeof matchedFn === 'function'
-        ? matchedFn(matchedArgs)
-        : matchedFn;
+      return typeof matchedFn === 'function' ? matchedFn(matchedArgs) : matchedFn;
     } catch (error) {
       try {
         return catchFn(error);
@@ -39,7 +39,6 @@ function makeMatchFunc(casesList: any[], elseFn, catchFn) {
 }
 
 function apiFactory() {
-
   let casesList = [];
   let elseFn = () => undefined;
   let catchFn = defaultCatchFn;

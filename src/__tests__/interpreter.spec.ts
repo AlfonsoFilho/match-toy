@@ -1,6 +1,6 @@
 import { gen, sample, sampleOne } from 'testcheck';
 import { compile } from '../compiler';
-import { FAIL, SUCCESS  } from '../constants';
+import { FAIL, SUCCESS } from '../constants';
 import { interpreter } from '../interpreter';
 import { AstType } from '../types';
 
@@ -10,7 +10,6 @@ declare let check;
 require('jasmine-check').install();
 
 describe('Interpreter', () => {
-
   /**
    * Helper function
    *
@@ -30,7 +29,6 @@ describe('Interpreter', () => {
   const run = (code, input) => interpreter(compile(code), input);
 
   describe('Literal pattern', () => {
-
     it('should match single numbers', () => {
       // case('1', () => 'code')
       expect(run('1', [1])).toEqual(SUCCESS);
@@ -68,10 +66,14 @@ describe('Interpreter', () => {
       expect(run('Infinity', [1])).toEqual(FAIL);
     });
 
-    check.it('should match a random sort of number patterns', gen.array(gen.number).notEmpty(), (x) => {
-      const pattern = x.join(', ');
-      expect(run(pattern, x)).toEqual(SUCCESS);
-    });
+    check.it(
+      'should match a random sort of number patterns',
+      gen.array(gen.number).notEmpty(),
+      x => {
+        const pattern = x.join(', ');
+        expect(run(pattern, x)).toEqual(SUCCESS);
+      }
+    );
 
     it('should match booleans', () => {
       // case('true', () => 'code')
@@ -136,13 +138,15 @@ describe('Interpreter', () => {
     it('should match multiple complex literal pattern', () => {
       // case('["a", [ { b: "true", c: { d: false }}], 0], "text"', () => 'code')
       expect(
-        run('["a", [ { b: "true", c: { d: false }}], 0], "text"',
-        [['a', [ { b: 'true', c: { d: false }}], 0], 'text'])).toEqual(SUCCESS);
+        run('["a", [ { b: "true", c: { d: false }}], 0], "text"', [
+          ['a', [{ b: 'true', c: { d: false } }], 0],
+          'text'
+        ])
+      ).toEqual(SUCCESS);
     });
   });
 
   describe('Bind pattern', () => {
-
     it('should bind one value', () => {
       // case('x', ({x}) => 'code')
       expect(run('x', [1])).toEqual([true, { x: 1 }]);
@@ -161,18 +165,18 @@ describe('Interpreter', () => {
 
     it('should bind from objects', () => {
       // case('{one: x, two: y}', ({x, y}) => 'code')
-      expect(run('{one: x, two: y}', [{ one: 1, two: 2}])).toEqual([true, { x: 1, y: 2 }]);
-      expect(run('{one: x, two: y}', [{ one: 1, wrong: 2}])).toEqual(FAIL);
-      expect(run('{one: x, two: y}', [{ one: 1, two: 2, three: 3}])).toEqual(FAIL);
+      expect(run('{one: x, two: y}', [{ one: 1, two: 2 }])).toEqual([true, { x: 1, y: 2 }]);
+      expect(run('{one: x, two: y}', [{ one: 1, wrong: 2 }])).toEqual(FAIL);
+      expect(run('{one: x, two: y}', [{ one: 1, two: 2, three: 3 }])).toEqual(FAIL);
       expect(run('{one: x, two: y}', [{ one: 1 }])).toEqual(FAIL);
     });
 
     it('should bind from objects with same key name', () => {
       // case('{ x, y }', ({x, y}) => 'code')
-      expect(run('{ x, y }', [{ x: 1, y: 2}])).toEqual([true, { x: 1, y: 2 }]);
-      expect(run('{ x, y }', [{ x: 1, z: 2}])).toEqual(FAIL);
-      expect(run('{ x, y }', [{ x: 1, y: 2, z: 3}])).toEqual(FAIL);
-      expect(run('{ x, y }', [{ }])).toEqual(FAIL);
+      expect(run('{ x, y }', [{ x: 1, y: 2 }])).toEqual([true, { x: 1, y: 2 }]);
+      expect(run('{ x, y }', [{ x: 1, z: 2 }])).toEqual(FAIL);
+      expect(run('{ x, y }', [{ x: 1, y: 2, z: 3 }])).toEqual(FAIL);
+      expect(run('{ x, y }', [{}])).toEqual(FAIL);
     });
 
     it('should bind from arrays', () => {
@@ -183,22 +187,21 @@ describe('Interpreter', () => {
     });
 
     describe('QuickCheck', () => {
-      check.it('should bind any value', gen.any, (y) => {
-        expect(run('x', [y])).toEqual([true, { x: y}]);
+      check.it('should bind any value', gen.any, y => {
+        expect(run('x', [y])).toEqual([true, { x: y }]);
       });
 
       check.it('should bind any value for multiple variables', gen.any, gen.any, (a, b) => {
-        expect(run('x, y', [a, b])).toEqual([true, { x: a, y: b}]);
+        expect(run('x, y', [a, b])).toEqual([true, { x: a, y: b }]);
       });
 
       check.it('should bind values and match constants', gen.any, gen.any, (a, b) => {
-        expect(run('x, y, 1', [a, b, 1])).toEqual([true, { x: a, y: b}]);
+        expect(run('x, y, 1', [a, b, 1])).toEqual([true, { x: a, y: b }]);
       });
     });
   });
 
   describe('Wildcard pattern', () => {
-
     it('should match simple wildcard', () => {
       // case('_', () => 'code')
       expect(run('_', [1])).toEqual(SUCCESS);
@@ -216,7 +219,7 @@ describe('Interpreter', () => {
 
     it('should match wildcard inside of an object', () => {
       // case('{ a: 1, b: _, c: 1 }', () => 'code')
-      expect(run('{ a: 1, b: _, c: 1 }', [{a: 1, b: '_', c: 1}])).toEqual(SUCCESS);
+      expect(run('{ a: 1, b: _, c: 1 }', [{ a: 1, b: '_', c: 1 }])).toEqual(SUCCESS);
     });
 
     it('should match wildcard inside of an array', () => {
@@ -227,11 +230,10 @@ describe('Interpreter', () => {
   });
 
   describe('Object pattern', () => {
-
     it('should match empty objects', () => {
       // case('{}', () => 'code')
       expect(run('{}', [{}])).toEqual(SUCCESS);
-      expect(run('{}', [{a: 1}])).toEqual(FAIL);
+      expect(run('{}', [{ a: 1 }])).toEqual(FAIL);
     });
 
     it('should match objects regardless order', () => {
@@ -242,18 +244,26 @@ describe('Interpreter', () => {
 
     it('should match destructuring objects', () => {
       // case('{ a: 1, ...tail }', ({ tail }) => 'code')
-      expect(run('{ a: 1, ...tail }', [{ a: 1, c: 3, b: 2}])).toEqual([ true, {tail: {b: 2, c: 3}} ]);
-      expect(run('{ a: 1, ... }', [{ a: 1, c: 3, b: 2}])).toEqual(SUCCESS);
-      expect(run('{...}', [{ a: 1, c: 3, b: 2}])).toEqual(SUCCESS);
+      expect(run('{ a: 1, ...tail }', [{ a: 1, c: 3, b: 2 }])).toEqual([
+        true,
+        { tail: { b: 2, c: 3 } }
+      ]);
+      expect(run('{ a: 1, ... }', [{ a: 1, c: 3, b: 2 }])).toEqual(SUCCESS);
+      expect(run('{...}', [{ a: 1, c: 3, b: 2 }])).toEqual(SUCCESS);
       expect(run('{...}', [{}])).toEqual(FAIL);
-      expect(run('{ a: 1, ...bc, d: x }', [{ a: 1, b: 2, c: 3, d: 4}])).toEqual([ true, {x: 4, bc: {b: 2, c: 3}} ]);
-      expect(run('{ a: 1, ...bc, d: 4 }', [{ a: 1, b: 2, c: 3, d: 4}])).toEqual([ true, {bc: {b: 2, c: 3}} ]);
-      expect(run('{ a: 1, ...bc, d: 4 }', [{ a: 1, b: 2, c: 3}])).toEqual(FAIL);
+      expect(run('{ a: 1, ...bc, d: x }', [{ a: 1, b: 2, c: 3, d: 4 }])).toEqual([
+        true,
+        { x: 4, bc: { b: 2, c: 3 } }
+      ]);
+      expect(run('{ a: 1, ...bc, d: 4 }', [{ a: 1, b: 2, c: 3, d: 4 }])).toEqual([
+        true,
+        { bc: { b: 2, c: 3 } }
+      ]);
+      expect(run('{ a: 1, ...bc, d: 4 }', [{ a: 1, b: 2, c: 3 }])).toEqual(FAIL);
     });
   });
 
-  describe('List/Array pattern',  () => {
-
+  describe('List/Array pattern', () => {
     it('should match empty list', () => {
       // case('[]', () => 'code')
       expect(run('[]', [[]])).toEqual(SUCCESS);
@@ -262,61 +272,77 @@ describe('Interpreter', () => {
 
     it('should match destructuring arrays', () => {
       // case('[1, ...tail]', ({ tail }) => 'code')
-      expect(run('[ 1, ...tail ]', [[ 1, 2, 3 ]])).toEqual([ true, {tail: [2, 3]} ]);
-      expect(run('[ 1, ... ]', [[ 1, 2, 3 ]])).toEqual(SUCCESS);
-      expect(run('[ 1, ... ]', [[ 1 ]])).toEqual(FAIL);
-      expect(run('[ ...all ]', [[ 1, 2, 3 ]])).toEqual([ true, {all: [1, 2, 3]} ]);
-      expect(run('[ ... ]', [[ 1, 2, 3 ]])).toEqual(SUCCESS);
-      expect(run('[ ... ]', [[ 1 ]])).toEqual(SUCCESS);
+      expect(run('[ 1, ...tail ]', [[1, 2, 3]])).toEqual([true, { tail: [2, 3] }]);
+      expect(run('[ 1, ... ]', [[1, 2, 3]])).toEqual(SUCCESS);
+      expect(run('[ 1, ... ]', [[1]])).toEqual(FAIL);
+      expect(run('[ ...all ]', [[1, 2, 3]])).toEqual([true, { all: [1, 2, 3] }]);
+      expect(run('[ ... ]', [[1, 2, 3]])).toEqual(SUCCESS);
+      expect(run('[ ... ]', [[1]])).toEqual(SUCCESS);
       expect(run('[ ... ]', [[]])).toEqual(FAIL);
-      expect(run('[ head, ...tail ]', [[1, 2, 3]])).toEqual([ true, {head: 1, tail: [2, 3]}]);
-      expect(run('[ a, b, c, ...xs ]', [[1, 2, 3, 4, 5]])).toEqual([ true, {a: 1, b: 2, c: 3, xs: [4, 5]}]);
-      expect(run('[ a, ...btox, y, z ]', [[1, 2, 3, 4, 5]])).toEqual([ true, {a: 1, btox: [2, 3], y: 4, z: 5}]);
+      expect(run('[ head, ...tail ]', [[1, 2, 3]])).toEqual([true, { head: 1, tail: [2, 3] }]);
+      expect(run('[ a, b, c, ...xs ]', [[1, 2, 3, 4, 5]])).toEqual([
+        true,
+        { a: 1, b: 2, c: 3, xs: [4, 5] }
+      ]);
+      expect(run('[ a, ...btox, y, z ]', [[1, 2, 3, 4, 5]])).toEqual([
+        true,
+        { a: 1, btox: [2, 3], y: 4, z: 5 }
+      ]);
     });
   });
 
   describe('Mapping pattern', () => {
-
     it('should filter and desconstruct an array', () => {
-
-      expect(run('[...characters({ name: hero, type: "hero", ... })]', [[
-        { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
-        { name: 'IronMan', alterEgo: 'Tony Stark', type: 'hero' },
-        { name: 'Doctor Doom', alterEgo: 'Victor Von Doom', type: 'villain' },
-        { name: 'Venom', alterEgo: 'Eddie Brock', type: 'villain' }
-      ]])).toEqual([true, {characters: [
-        { hero: 'Spiderman' },
-        { hero: 'IronMan' }
-      ]}]);
+      expect(
+        run('[...characters({ name: hero, type: "hero", ... })]', [
+          [
+            { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
+            { name: 'IronMan', alterEgo: 'Tony Stark', type: 'hero' },
+            { name: 'Doctor Doom', alterEgo: 'Victor Von Doom', type: 'villain' },
+            { name: 'Venom', alterEgo: 'Eddie Brock', type: 'villain' }
+          ]
+        ])
+      ).toEqual([true, { characters: [{ hero: 'Spiderman' }, { hero: 'IronMan' }] }]);
     });
 
     it('should filter and desconstruct an array with specific schema', () => {
+      expect(
+        run('[...characters({ name: hero, type: "hero"})]', [
+          [
+            { name: 'Spiderman', type: 'hero' },
+            { name: 'IronMan', type: 'hero' },
+            { name: 'Doctor Doom', type: 'villain' },
+            { name: 'Venom', type: 'villain' }
+          ]
+        ])
+      ).toEqual([true, { characters: [{ hero: 'Spiderman' }, { hero: 'IronMan' }] }]);
 
-      expect(run('[...characters({ name: hero, type: "hero"})]', [[
-        { name: 'Spiderman', type: 'hero' },
-        { name: 'IronMan', type: 'hero' },
-        { name: 'Doctor Doom', type: 'villain' },
-        { name: 'Venom', type: 'villain' }
-      ]])).toEqual([true, {characters: [
-        { hero: 'Spiderman' },
-        { hero: 'IronMan' }
-      ]}]);
-
-      expect(run('[...characters({ name: hero, type: "hero"})]', [[
-        { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
-        { name: 'IronMan', alterEgo: 'Tony Stark', type: 'hero' },
-        { name: 'Doctor Doom', alterEgo: 'Victor Von Doom', type: 'villain' },
-        { name: 'Venom', alterEgo: 'Eddie Brock', type: 'villain' }
-      ]])).toEqual(FAIL);
+      expect(
+        run('[...characters({ name: hero, type: "hero"})]', [
+          [
+            { name: 'Spiderman', alterEgo: 'Peter Parker', type: 'hero' },
+            { name: 'IronMan', alterEgo: 'Tony Stark', type: 'hero' },
+            { name: 'Doctor Doom', alterEgo: 'Victor Von Doom', type: 'villain' },
+            { name: 'Venom', alterEgo: 'Eddie Brock', type: 'villain' }
+          ]
+        ])
+      ).toEqual(FAIL);
     });
 
     it('should redux', () => {
       // pattern = compile('[...todos({ completed: true, ... } & { completed, text, id })], "SHOW_COMPLETED"');
-      expect(run('[...todos({ completed@: true, text, id })], "SHOW_COMPLETED"', [[
-        { id: 0, text: 'Peter Parker', completed: true },
-        { id: 1, text: 'Mary Jane', completed: true },
-        { id: 2, text: 'Norman Osborn', completed: false }
-      ], 'SHOW_COMPLETED'])).toEqual([ true, {
+      expect(
+        run('[...todos({ completed@: true, text, id })], "SHOW_COMPLETED"', [
+          [
+            { id: 0, text: 'Peter Parker', completed: true },
+            { id: 1, text: 'Mary Jane', completed: true },
+            { id: 2, text: 'Norman Osborn', completed: false }
+          ],
+          'SHOW_COMPLETED'
+        ])
+      ).toEqual([
+        true,
+        {
           todos: [
             { id: 0, text: 'Peter Parker', completed: true },
             { id: 1, text: 'Mary Jane', completed: true }
@@ -326,21 +352,28 @@ describe('Interpreter', () => {
     });
 
     it('should filter and desconstruct an object', () => {
-
-      expect(run('{...characters({ alterEgo: name, type: "hero"})}', [{
-        'Spiderman': {alterEgo: 'Peter Parker', type: 'hero' },
-        'IronMan': { alterEgo: 'Tony Stark', type: 'hero' },
-        'Doctor Doom': { alterEgo: 'Victor Von Doom', type: 'villain' },
-        'Venom': { alterEgo: 'Eddie Brock', type: 'villain' }
-      }])).toEqual([true, {characters: {
-        Spiderman: { name: 'Peter Parker'},
-        IronMan: { name: 'Tony Stark' }
-      } }]);
+      expect(
+        run('{...characters({ alterEgo: name, type: "hero"})}', [
+          {
+            Spiderman: { alterEgo: 'Peter Parker', type: 'hero' },
+            IronMan: { alterEgo: 'Tony Stark', type: 'hero' },
+            'Doctor Doom': { alterEgo: 'Victor Von Doom', type: 'villain' },
+            Venom: { alterEgo: 'Eddie Brock', type: 'villain' }
+          }
+        ])
+      ).toEqual([
+        true,
+        {
+          characters: {
+            Spiderman: { name: 'Peter Parker' },
+            IronMan: { name: 'Tony Stark' }
+          }
+        }
+      ]);
     });
   });
 
   describe('Range pattern', () => {
-
     it('should match in a range of numbers', () => {
       // case('0..10', () => 'code')
       expect(run('0..10', [0])).toEqual(SUCCESS);
@@ -364,17 +397,22 @@ describe('Interpreter', () => {
     });
 
     describe('QuickCheck', () => {
-      check.it('should match in a range of numbers', gen.number, gen.int, gen.int, (x, start, end) => {
-
-        if (x >=  start && x <= end) {
-          expect(run(`${start}..${end}`, [x])).toEqual(SUCCESS);
-        } else {
-          expect(run(`${start}..${end}`, [x])).toEqual(FAIL);
+      check.it(
+        'should match in a range of numbers',
+        gen.number,
+        gen.int,
+        gen.int,
+        (x, start, end) => {
+          if (x >= start && x <= end) {
+            expect(run(`${start}..${end}`, [x])).toEqual(SUCCESS);
+          } else {
+            expect(run(`${start}..${end}`, [x])).toEqual(FAIL);
+          }
         }
-      });
+      );
 
       check.it('should match in a range of chars', gen.char, 'a', 'z', (x, start, end) => {
-        if (x >=  start && x <= end) {
+        if (x >= start && x <= end) {
           expect(run(`${start}..${end}`, [x])).toEqual(SUCCESS);
         } else {
           expect(run(`${start}..${end}`, [x])).toEqual(FAIL);
@@ -387,13 +425,14 @@ describe('Interpreter', () => {
     it('should match regular expressions', () => {
       // case('/^http/', () => 'code')
       const toJson = JSON.stringify;
-      expect(toJson(run('/^http/', ['http://www.google.com']))).toEqual(toJson([true, { result: ['http'] }]));
+      expect(toJson(run('/^http/', ['http://www.google.com']))).toEqual(
+        toJson([true, { result: ['http'] }])
+      );
       expect(toJson(run('/^http/', ['www.google.com']))).toEqual(toJson(FAIL));
     });
   });
 
   describe('Logical pattern', () => {
-
     it('should match one of the two patterns (Or pattern)', () => {
       // case('1 | 'two', () => 'code')
       expect(run(' 1 | "two"', [1])).toEqual(SUCCESS);
@@ -401,7 +440,7 @@ describe('Interpreter', () => {
       expect(run(' 1 | "two"', [4])).toEqual(FAIL);
       expect(run(' 1 | "two"', [1, 'two'])).toEqual(FAIL);
       expect(run(' 2 | "two", x', [2])).toEqual(SUCCESS);
-      expect(run(' 2 | "two", x', ['two', 4])).toEqual([ true, { x: 4 }]);
+      expect(run(' 2 | "two", x', ['two', 4])).toEqual([true, { x: 4 }]);
       expect(run(' 1 | 2 | 3', [1])).toEqual(SUCCESS);
       expect(run(' 1 | 2 | 3', [2])).toEqual(SUCCESS);
       expect(run(' 1 | 2 | 3', [3])).toEqual(SUCCESS);
@@ -410,24 +449,23 @@ describe('Interpreter', () => {
 
     it('should match all patterns (And pattern)', () => {
       // case('2, x & _, 1', ({x}) => 'code')
-      expect(run('2, x & _, 1', [2, 1])).toEqual([ true, { x: 1 }]);
+      expect(run('2, x & _, 1', [2, 1])).toEqual([true, { x: 1 }]);
       expect(run('2, x & _, 1', [2, 2])).toEqual(FAIL);
       expect(run('2, x & _, 1', [2])).toEqual(FAIL);
       expect(run('2, x & _, 1', [2, 1, 0])).toEqual(FAIL);
-      expect(run('2, x, _ & _, 1, y & _, _, 3', [2, 1, 3])).toEqual([ true, { x: 1, y: 3 } ]);
+      expect(run('2, x, _ & _, 1, y & _, _, 3', [2, 1, 3])).toEqual([true, { x: 1, y: 3 }]);
       expect(run('2, x, _ & _, 1, y & _, _, 3', [2, 1, 1])).toEqual(FAIL);
       expect(run('2, x, _ & _, 1, y & _, _, 3', [2, 1])).toEqual(FAIL);
     });
 
     it('should mix both logical patterns', () => {
       // case('1, 2 | 4, 2 & _, x', () => 'code')
-      expect(run('1, 2 | 4, 2 & _, x', [1, 2])).toEqual([ true, { x: 2 }]);
-      expect(run('1, 2 | 4, 2 & _, x', [4, 2])).toEqual([ true, { x: 2 }]);
+      expect(run('1, 2 | 4, 2 & _, x', [1, 2])).toEqual([true, { x: 2 }]);
+      expect(run('1, 2 | 4, 2 & _, x', [4, 2])).toEqual([true, { x: 2 }]);
     });
   });
 
   describe('As pattern', () => {
-
     it('should bind alias on literals', () => {
       // case('x@1', ({ x }) => 'code')
       expect(run('x@1', [1])).toEqual([true, { x: 1 }]);
@@ -436,7 +474,6 @@ describe('Interpreter', () => {
       expect(run('x@"text"', ['text'])).toEqual([true, { x: 'text' }]);
       // tslint:disable-next-line:quotemark
       expect(run("x@'text'", ['text'])).toEqual([true, { x: 'text' }]);
-
     });
 
     it('should bind alias on ranges', () => {
@@ -459,12 +496,24 @@ describe('Interpreter', () => {
     });
 
     it('should bind alias on objects', () => {
-      expect(run('x@{one: 1}', [{one: 1}])).toEqual([true, { x: {one: 1} }]);
-      expect(run('{one@: 1}', [{one: 1}])).toEqual([true, { one: 1 }]);
-      expect(run('{one: { two: { three@:3 } }}', [{one: { two: { three: 3 }}}])).toEqual([true, { three: 3 }]);
-      expect(run('x@{one@: 1, two: 2}', [{ one: 1, two: 2 }])).toEqual([true, { x: {one: 1, two: 2}, one: 1 }]);
-      expect(run('x@{a@one: 1, two: 2}', [{ one: 1, two: 2 }])).toEqual([true, { x: {one: 1, two: 2}, a: 1 }]);
-      expect(run('x@{one@one: 1, two: 2}', [{ one: 1, two: 2 }])).toEqual([true, { x: {one: 1, two: 2}, one: 1 }]);
+      expect(run('x@{one: 1}', [{ one: 1 }])).toEqual([true, { x: { one: 1 } }]);
+      expect(run('{one@: 1}', [{ one: 1 }])).toEqual([true, { one: 1 }]);
+      expect(run('{one: { two: { three@:3 } }}', [{ one: { two: { three: 3 } } }])).toEqual([
+        true,
+        { three: 3 }
+      ]);
+      expect(run('x@{one@: 1, two: 2}', [{ one: 1, two: 2 }])).toEqual([
+        true,
+        { x: { one: 1, two: 2 }, one: 1 }
+      ]);
+      expect(run('x@{a@one: 1, two: 2}', [{ one: 1, two: 2 }])).toEqual([
+        true,
+        { x: { one: 1, two: 2 }, a: 1 }
+      ]);
+      expect(run('x@{one@one: 1, two: 2}', [{ one: 1, two: 2 }])).toEqual([
+        true,
+        { x: { one: 1, two: 2 }, one: 1 }
+      ]);
     });
 
     it('should bind alias on sequences', () => {
@@ -475,12 +524,12 @@ describe('Interpreter', () => {
     });
 
     it('should bind alias with logical or', () => {
-        expect(run('x@(1, 2 | 3, 4, 5)', [1, 2])).toEqual([true, { x: [1, 2] }]);
-        expect(run('x@(1, 2 | 3, 4, 5)', [3, 4, 5])).toEqual([true, { x: [3, 4, 5] }]);
-        expect(run('x@(1, 2 | 3, 4)', [3, 4])).toEqual([true, { x: [3, 4] }]);
-        expect(run('x@(1 | 2, 3 | 4, 5, 6)', [1])).toEqual([true, { x: [1] }]);
-        expect(run('x@(1 | 2, 3 | 4, 5, 6)', [2, 3])).toEqual([true, { x: [2, 3] }]);
-        expect(run('x@(1 | 2, 3 | 4, 5, 6)', [4, 5, 6])).toEqual([true, { x: [4, 5, 6] }]);
+      expect(run('x@(1, 2 | 3, 4, 5)', [1, 2])).toEqual([true, { x: [1, 2] }]);
+      expect(run('x@(1, 2 | 3, 4, 5)', [3, 4, 5])).toEqual([true, { x: [3, 4, 5] }]);
+      expect(run('x@(1, 2 | 3, 4)', [3, 4])).toEqual([true, { x: [3, 4] }]);
+      expect(run('x@(1 | 2, 3 | 4, 5, 6)', [1])).toEqual([true, { x: [1] }]);
+      expect(run('x@(1 | 2, 3 | 4, 5, 6)', [2, 3])).toEqual([true, { x: [2, 3] }]);
+      expect(run('x@(1 | 2, 3 | 4, 5, 6)', [4, 5, 6])).toEqual([true, { x: [4, 5, 6] }]);
     });
 
     it('should bind alias with logical and', () => {
@@ -525,7 +574,6 @@ describe('Interpreter', () => {
   });
 
   describe('Type pattern', () => {
-
     it('should match an primitive type', () => {
       // case('Boolean', () => 'code')
       expect(run('Boolean', [true])).toEqual(SUCCESS);
@@ -541,7 +589,13 @@ describe('Interpreter', () => {
       expect(run('Null', [null])).toEqual(SUCCESS);
       expect(run('Array', [[1]])).toEqual(SUCCESS);
       expect(run('Object', [{}])).toEqual(SUCCESS);
-      expect(run('Function', [() => {/**/}])).toEqual(SUCCESS);
+      expect(
+        run('Function', [
+          () => {
+            /**/
+          }
+        ])
+      ).toEqual(SUCCESS);
       expect(run('RegExp', [/a-z/])).toEqual(SUCCESS);
       expect(run('Date', [new Date()])).toEqual(SUCCESS);
     });
@@ -557,14 +611,17 @@ describe('Interpreter', () => {
       expect(run('Nullable', [1])).toEqual(FAIL);
       expect(run('Nullable', ['1'])).toEqual(FAIL);
       expect(run('Nullable', [[1]])).toEqual(FAIL);
-      expect(run('Nullable', [{one: 1}])).toEqual(FAIL);
+      expect(run('Nullable', [{ one: 1 }])).toEqual(FAIL);
       expect(run('Nullable', [new Date()])).toEqual(FAIL);
     });
 
     it('should match typed variables, arrays and wildcards', () => {
       // case('x:Boolean, y:Object', ({ x, y }) => 'code')
-      expect(run('x:Boolean, y:Object', [true, {one: 1}])).toEqual([ true, { x: true, y: {one: 1}} ]);
-      expect(run('x:Boolean, y:Object', ['true', {one: 1}])).toEqual(FAIL);
+      expect(run('x:Boolean, y:Object', [true, { one: 1 }])).toEqual([
+        true,
+        { x: true, y: { one: 1 } }
+      ]);
+      expect(run('x:Boolean, y:Object', ['true', { one: 1 }])).toEqual(FAIL);
       expect(run('_:String', ['text'])).toEqual(SUCCESS);
       expect(run('_:String', ['text', 'wrong'])).toEqual(FAIL);
       expect(run('_:String', [1])).toEqual(FAIL);
@@ -576,7 +633,9 @@ describe('Interpreter', () => {
     it('should match instances', () => {
       // case('Color', () => 'code')
 
-      function Color() {/**/}
+      function Color() {
+        /**/
+      }
       const red = new Color();
 
       expect(run('Color', [red])).toEqual(SUCCESS);

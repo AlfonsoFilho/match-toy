@@ -2,9 +2,9 @@
  * @module API
  */
 // TYPE
-export type MatchSucess = [ true, {[key: string]: any} ];
-export type MatchFail = [ false, {[key: string]: any} ];
-export type MatchResult = MatchSucess | MatchFail | [ boolean, {[key: string]: any} ];
+export type MatchSucess = [true, { [key: string]: any }];
+export type MatchFail = [false, { [key: string]: any }];
+export type MatchResult = MatchSucess | MatchFail | [boolean, { [key: string]: any }];
 export type AnyFn = (...args: any[]) => any;
 export type GuardFn = (...args: any[]) => boolean;
 
@@ -19,10 +19,10 @@ export interface Pattern {
 
 export interface Location {
   start: {
-    offset: number
+    offset: number;
   };
   end: {
-    offset: number
+    offset: number;
   };
 }
 

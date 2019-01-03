@@ -2,7 +2,7 @@ import { compile } from '../compiler';
 
 const makeParserError = ([offsetStart, offsetEnd], found, expected) => {
   return {
-    location:{
+    location: {
       start: {
         offset: offsetStart
       },
@@ -12,8 +12,8 @@ const makeParserError = ([offsetStart, offsetEnd], found, expected) => {
     },
     found,
     expected
-  }
-}
+  };
+};
 
 describe('Compiler', () => {
   it('should call parser', () => {
@@ -23,10 +23,8 @@ describe('Compiler', () => {
   });
 
   it('should handle end error', () => {
-    const parse = () => { 
-      throw makeParserError([3, 4], '?', [
-        { type: 'end' } 
-      ]);
+    const parse = () => {
+      throw makeParserError([3, 4], '?', [{ type: 'end' }]);
     };
 
     expect(() => {
@@ -41,10 +39,8 @@ Found \`?\`, but expected one of:
   });
 
   it('should handle description parser', () => {
-    const parse = () => { 
-      throw makeParserError([3, 4], '?', [
-        { description: 'literal' } 
-      ]);
+    const parse = () => {
+      throw makeParserError([3, 4], '?', [{ description: 'literal' }]);
     };
 
     expect(() => {
@@ -58,16 +54,14 @@ Found \`?\`, but expected one of:
 `);
   });
 
-it('should handle text error', () => {
-  const parse = () => { 
-    throw makeParserError([0, 4], '?', [
-      { text: 'literal' } 
-    ]);
-  };
+  it('should handle text error', () => {
+    const parse = () => {
+      throw makeParserError([0, 4], '?', [{ text: 'literal' }]);
+    };
 
-  expect(() => {
-    compile('x, ?', parse);
-  }).toThrowError(`Match-toy Syntax Error:
+    expect(() => {
+      compile('x, ?', parse);
+    }).toThrowError(`Match-toy Syntax Error:
 x, ?
 ^^^^
 

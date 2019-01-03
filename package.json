@@ -58,6 +58,7 @@
     "ts-jest": "23.10.5",
     "ts-pegjs": "0.2.2",
     "tslint": "5.12.0",
+    "tslint-config-prettier": "1.17.0",
     "tslint-eslint-rules": "5.4.0",
     "typescript": "3.2.2"
   },
