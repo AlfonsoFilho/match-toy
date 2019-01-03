@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## <small>3.0.3 (2019-01-03)</small>
+
+* chore(examples): fixed runkit example ([d97c400](https://github.com/match-toy/match-toy/commit/d97c400))
+* chore(release): 3.0.3 ([38e8cfe](https://github.com/match-toy/match-toy/commit/38e8cfe))
+
+
+
+## <small>3.0.2 (2019-01-03)</small>
+
+* chore(release): 3.0.2 ([3a71960](https://github.com/match-toy/match-toy/commit/3a71960))
+
+
+
 ## <small>3.0.1 (2019-01-03)</small>
 
 * chore: fixed conflict between tslint and prietter ([66c4992](https://github.com/match-toy/match-toy/commit/66c4992))
@@ -16,7 +29,7 @@ All notable changes to this project will be documented in this file. See [standa
 * chore: standard-version and ts-pegjs ([b1e661b](https://github.com/match-toy/match-toy/commit/b1e661b))
 * chore: tslint and tslint-eslint-rules updated ([1a0c927](https://github.com/match-toy/match-toy/commit/1a0c927))
 * chore: typescript updated ([74c7b0b](https://github.com/match-toy/match-toy/commit/74c7b0b))
-* chore(release): 3.0.1 ([3a262b8](https://github.com/match-toy/match-toy/commit/3a262b8))
+* chore(release): 3.0.1 ([d48f3b7](https://github.com/match-toy/match-toy/commit/d48f3b7))
 * fix: fixed circular dependency ([637f65f](https://github.com/match-toy/match-toy/commit/637f65f))
 * Update README.md ([a89c23d](https://github.com/match-toy/match-toy/commit/a89c23d))
 * Update to node 10 in .nvmrc ([92f2413](https://github.com/match-toy/match-toy/commit/92f2413))
