@@ -9,5 +9,7 @@ export const range = (input: string | number, node: AstNode): MatchResult => {
     return FAIL;
   }
 
-  return input >= start && input <= end ? [ true, {...addBind(node, input), ...addAlias(node, input)} ] : FAIL;
+  return input >= start && input <= end
+    ? [true, { ...addBind(node, input), ...addAlias(node, input) }]
+    : FAIL;
 };

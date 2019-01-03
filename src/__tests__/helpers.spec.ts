@@ -1,7 +1,6 @@
 import { contains, is, reverse } from '../helpers';
 
 describe('Helpers', () => {
-
   describe('is', () => {
     it('should check type', () => {
       expect(is('', 'String')).toBe(true);
@@ -28,5 +27,4 @@ describe('Helpers', () => {
       expect(contains(1, [1, 2, 3])).toBe(true);
     });
   });
-
 });

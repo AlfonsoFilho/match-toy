@@ -1,7 +1,6 @@
 import { AstNode, AstType } from './types';
 
 export const is = (obj: any, type: string | string[]): boolean => {
-
   const check = (o: any, t: string) => Object.prototype.toString.call(o) === `[object ${t}]`;
 
   if (typeof type === 'string') {
@@ -9,7 +8,7 @@ export const is = (obj: any, type: string | string[]): boolean => {
   }
 
   if (Array.isArray(type)) {
-    return type.some((typeItem) => check(obj, typeItem));
+    return type.some(typeItem => check(obj, typeItem));
   }
 
   return false;
@@ -17,7 +16,8 @@ export const is = (obj: any, type: string | string[]): boolean => {
 
 export const reverse = (arr: any[] = []) => ([] as any).concat(arr).reverse();
 
-export const contains = (value: any, arr: any[]) => (Array as any).prototype.includes.call(arr, value);
+export const contains = (value: any, arr: any[]) =>
+  (Array as any).prototype.includes.call(arr, value);
 
 export const isNullable = (value: any) => {
   if (typeof value === 'undefined' || value === null) {
@@ -48,12 +48,29 @@ export const isType = (value: any, { typeOf }: any) => {
     return Number.isNaN(value);
   }
 
-  if (contains(typeOf, ['String', 'Number', 'Boolean', 'Array', 'Object', 'Function', 'Null', 'Undefined'])) {
+  if (
+    contains(typeOf, [
+      'String',
+      'Number',
+      'Boolean',
+      'Array',
+      'Object',
+      'Function',
+      'Null',
+      'Undefined'
+    ])
+  ) {
     return is(value, typeOf);
   }
 
   if (typeof value === 'object') {
-    return typeOf === value.constructor.toString().match(/(?!function)\s+(?:\w+)(?!\s\()/)[0].trim();
+    return (
+      typeOf ===
+      value.constructor
+        .toString()
+        .match(/(?!function)\s+(?:\w+)(?!\s\()/)[0]
+        .trim()
+    );
   }
 
   return false;
