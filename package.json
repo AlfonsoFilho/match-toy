@@ -39,7 +39,7 @@
   "author": "Alfonso Filho <alfonsocfilho@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "23.3.11",
+    "@types/jest": "24.0.0",
     "@types/node": "10.x.x",
     "jasmine-check": "1.0.0-rc.0",
     "jest": "23.6.0",
