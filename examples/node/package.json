@@ -7,6 +7,6 @@
     "match-toy": "../.."
   },
   "devDependencies": {
-    "standard-version": "4.3.0"
+    "standard-version": "5.0.2"
   }
 }
