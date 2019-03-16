@@ -54,7 +54,7 @@
     "rollup-plugin-node-resolve": "4.0.0",
     "rollup-plugin-typescript": "1.0.0",
     "rollup-plugin-uglify": "6.0.0",
-    "standard-version": "4.4.0",
+    "standard-version": "5.0.2",
     "ts-jest": "23.10.5",
     "ts-pegjs": "0.2.2",
     "tslint": "5.12.0",
