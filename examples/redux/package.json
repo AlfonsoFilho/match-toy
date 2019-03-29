@@ -11,7 +11,7 @@
     "match-toy": "../..",
     "prop-types": "^15.5.10",
     "react": "16.8.6",
-    "react-dom": "16.3.2",
+    "react-dom": "16.8.6",
     "react-redux": "^5.0.5",
     "redux": "^4.0.0"
   },
